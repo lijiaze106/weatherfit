@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeatherFit – A sport for every kind of weather</title>
+  <meta name="description" content="Tell WeatherFit the weather outside and get sports that fit and the gear to bring.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+      --text: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --chalk: #f2f5f4;
+      --night: #0f1c2e;
+      --sunny-yellow: #f7d774;
+      --nav-h: 3.75rem;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: var(--text);
+      font-size: 1.0625rem;
+      line-height: 1.6;
+      color: var(--night);
+      background: var(--chalk);
+      padding-bottom: var(--nav-h);
+    }
+
+    h1, h2, h3 {
+      font-family: var(--display);
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      margin: 0;
+    }
+
+    a { color: inherit; }
+
+    :focus-visible {
+      outline: 3px solid currentColor;
+      outline-offset: 3px;
+    }
+
+    /* ======================================================
+       THE STAGE: header + hero share one weather theme
+       ====================================================== */
+    .stage {
+      --bg: #f7d774;
+      --ink: #2a2008;
+      --sun: #f26b1d;
+      --cloud: #fff8e6;
+      --drop: #2a2008;
+      background: var(--bg);
+      color: var(--ink);
+      transition: background-color .6s ease, color .6s ease;
+    }
+    .stage[data-weather="cloudy"] { --bg: #c9d4de; --ink: #17232f; --sun: #f7d774; --cloud: #f7f9fb; }
+    .stage[data-weather="rainy"]  { --bg: #2c4a69; --ink: #f1f6fb; --sun: #f7d774; --cloud: #8ea8c1; --drop: #bcd8f2; }
+    .stage[data-weather="snowy"]  { --bg: #dce7f1; --ink: #1a2a3a; --sun: #f7d774; --cloud: #ffffff; --drop: #7f9fc0; }
+    .stage[data-weather="windy"]  { --bg: #9fcbb9; --ink: #0e2f28; --sun: #f7d774; --cloud: #e8f4ef; --drop: #0e5a46; }
+
+    /* ---------- Header ---------- */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 1.1rem 1.25rem;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+    }
+    .brand svg { width: 1.7rem; height: 1.7rem; }
+
+    /* Mobile: bottom navigation bar */
+    .site-nav {
+      position: fixed;
+      z-index: 10;
+      left: .75rem; right: .75rem; bottom: .75rem;
+      height: var(--nav-h);
+      background: var(--night);
+      border-radius: 1.2rem;
+      box-shadow: 0 10px 30px rgba(15, 28, 46, .28);
+    }
+    .site-nav ul {
+      display: flex;
+      height: 100%;
+      margin: 0; padding: .35rem;
+      list-style: none;
+      gap: .25rem;
+    }
+    .site-nav li { flex: 1; }
+    .site-nav a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      border-radius: .9rem;
+      font-size: .8rem;
+      font-weight: 500;
+      white-space: nowrap;
+      text-decoration: none;
+      color: #b9c6d6;
+    }
+    .site-nav a[aria-current="page"] {
+      background: #f2f5f4;
+      color: var(--night);
+      font-weight: 700;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      gap: 1.5rem;
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: .5rem 1.25rem 3.5rem;
+    }
+
+    .scene {
+      width: min(46vw, 11rem);
+      justify-self: center;
+      order: -1;
+    }
+    .scene svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+    .scene g { transition: opacity .5s ease, transform .6s cubic-bezier(.3,.8,.3,1); }
+    .scene .sun, .scene .cloud, .scene .rain, .scene .snow, .scene .wind { opacity: 0; }
+
+    .sun-fill { fill: var(--sun); }
+    .cloud-fill { fill: var(--cloud); }
+    .drop-stroke { stroke: var(--drop); }
+    .drop-fill { fill: var(--drop); }
+
+    .stage[data-weather="sunny"]  .sun   { opacity: 1; }
+    .stage[data-weather="cloudy"] .sun   { opacity: 1; transform: translate(-46px, -22px) scale(.8); }
+    .stage[data-weather="cloudy"] .cloud,
+    .stage[data-weather="rainy"]  .cloud,
+    .stage[data-weather="snowy"]  .cloud,
+    .stage[data-weather="windy"]  .cloud { opacity: 1; }
+    .stage[data-weather="rainy"]  .rain  { opacity: 1; }
+    .stage[data-weather="snowy"]  .snow  { opacity: 1; }
+    .stage[data-weather="windy"]  .wind  { opacity: 1; }
+    .stage[data-weather="windy"]  .cloud { transform: translate(40px, -30px) scale(.7); }
+
+
+    /* 3D canvas (three.js) replaces the flat SVG when WebGL is available */
+    .scene.is-3d svg { display: none; }
+    .scene canvas { display: block; width: 100%; height: auto; aspect-ratio: 1; }
+
+    .rain line { stroke-width: 7; stroke-linecap: round; animation: fall 1.1s linear infinite; }
+    .rain line:nth-child(2n) { animation-delay: -.35s; }
+    .rain line:nth-child(3n) { animation-delay: -.7s; }
+    .snow circle { animation: drift 2.6s ease-in-out infinite; }
+    .snow circle:nth-child(2n) { animation-delay: -.9s; }
+    .snow circle:nth-child(3n) { animation-delay: -1.7s; }
+    .wind path { fill: none; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 180 40; animation: gust 2.2s ease-in-out infinite; }
+    .wind path:nth-child(2) { animation-delay: -.7s; }
+    .wind path:nth-child(3) { animation-delay: -1.4s; }
+
+    @keyframes fall  { 0% { transform: translateY(-14px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(26px); opacity: 0; } }
+    @keyframes drift { 0%, 100% { transform: translate(0, -6px); } 50% { transform: translate(8px, 16px); } }
+    @keyframes gust  { 0%, 100% { transform: translateX(-14px); } 50% { transform: translateX(14px); } }
+
+    .hero h1 {
+      font-size: clamp(2.3rem, 8vw, 4.1rem);
+      font-weight: 700;
+      max-width: 16ch;
+    }
+
+    .picker { border: 0; margin: 1.5rem 0 0; padding: 0; min-width: 0; }
+    .picker legend {
+      padding: 0;
+      margin-bottom: .75rem;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: .55rem; }
+    .chip { position: relative; }
+    .chip input {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+    .chip span {
+      display: block;
+      padding: .6rem 1.15rem;
+      border: 2px solid currentColor;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: .98rem;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    .chip input:checked + span { background: var(--ink); color: var(--bg); }
+    .chip input:focus-visible + span { outline: 3px solid currentColor; outline-offset: 3px; }
+
+    .suggestion { margin-top: 1.5rem; max-width: 34rem; }
+    .suggestion dl { margin: 0; display: grid; gap: 1rem; }
+    .suggestion dt { font-weight: 700; font-size: .95rem; opacity: .8; }
+    .suggestion dd {
+      margin: .15rem 0 0;
+      font-family: var(--display);
+      font-size: clamp(1.4rem, 4.6vw, 1.9rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .suggestion dd.gear { font-family: var(--text); font-size: 1.1rem; font-weight: 500; letter-spacing: 0; }
+
+    .button {
+      display: inline-block;
+      margin-top: 1.75rem;
+      padding: .95rem 1.6rem;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--bg);
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .2s ease;
+    }
+    .button:hover { transform: translateY(-2px); }
+
+    /* ======================================================
+       HOW IT WORKS
+       ====================================================== */
+    .how {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 4.5rem 1.25rem 4rem;
+    }
+    .how h2 { font-size: clamp(1.9rem, 5vw, 3rem); font-weight: 700; max-width: 14ch; }
+    .how ol {
+      list-style: none;
+      margin: 2.5rem 0 0;
+      padding: 0;
+      display: grid;
+      gap: 2rem;
+    }
+    .how li { border-top: 2px solid var(--night); padding-top: 1rem; max-width: 22rem; }
+    .how .n { display: block; font-family: var(--display); font-weight: 800; font-size: 2.6rem; line-height: 1; margin-bottom: .6rem; }
+    .how h3 { font-size: 1.35rem; font-weight: 700; margin-bottom: .35rem; }
+    .how p { margin: 0; color: #3b4a5c; }
+
+    /* ======================================================
+       CLOSING CALL TO ACTION + FOOTER
+       ====================================================== */
+    .closing { background: var(--night); color: #f2f5f4; }
+    .closing-inner {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 3.5rem 1.25rem;
+    }
+    .closing h2 { font-size: clamp(1.9rem, 5vw, 3rem); font-weight: 700; max-width: 16ch; }
+    .closing .button { background: var(--sunny-yellow); color: var(--night); }
+
+    .site-footer {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 1.75rem 1.25rem 2.5rem;
+      font-size: .9rem;
+      color: #46566a;
+    }
+    .site-footer p { margin: 0; max-width: 46rem; }
+
+    /* ======================================================
+       DESKTOP
+       ====================================================== */
+    @media (min-width: 52rem) {
+      body { padding-bottom: 0; }
+
+      .site-header { padding: 1.5rem 2rem; }
+
+      .site-nav {
+        position: static;
+        height: auto;
+        background: none;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      .site-nav ul { padding: 0; gap: .25rem; }
+      .site-nav li { flex: none; }
+      .site-nav a {
+        padding: .55rem 1rem;
+        color: inherit;
+        font-size: 1rem;
+        opacity: .85;
+      }
+      .site-nav a:hover { opacity: 1; }
+      .site-nav a[aria-current="page"] {
+        background: transparent;
+        color: inherit;
+        opacity: 1;
+        box-shadow: inset 0 -3px 0 currentColor;
+        border-radius: 0;
+      }
+
+      .hero {
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+        align-items: center;
+        gap: 3rem;
+        padding: 1.5rem 2rem 4rem;
+      }
+      .scene { order: 0; width: min(100%, 26rem); justify-self: end; }
+
+      .how { padding: 6rem 2rem 5rem; }
+      .how ol { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
+      .closing-inner { padding: 5rem 2rem; }
+      .site-footer { padding: 2rem 2rem 3rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .stage, .scene g, .chip span, .button { transition: none; }
+      .rain line, .snow circle, .wind path { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stage" id="stage" data-weather="sunny">
+    <header class="site-header">
+      <a class="brand" href="index.html">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="12" cy="12" r="7" fill="currentColor"/>
+          <path d="M10 26a6 6 0 0 1 1-11.9A8 8 0 0 1 26.5 17 4.8 4.8 0 0 1 25.5 26Z" fill="currentColor" stroke="var(--bg)" stroke-width="2"/>
+        </svg>
+        WeatherFit
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="index.html" aria-current="page">Home</a></li>
+          <li><a href="plan.html">Your Plan</a></li>
+          <li><a href="sports.html">Sports Guide</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <h1 id="hero-title">Whatever the weather, there's a sport for it.</h1>
+
+          <fieldset class="picker">
+            <legend>What's it like outside?</legend>
+            <div class="chips">
+              <label class="chip"><input type="radio" name="weather" value="sunny" checked><span>Sunny</span></label>
+              <label class="chip"><input type="radio" name="weather" value="cloudy"><span>Cloudy</span></label>
+              <label class="chip"><input type="radio" name="weather" value="rainy"><span>Rainy</span></label>
+              <label class="chip"><input type="radio" name="weather" value="snowy"><span>Snowy</span></label>
+              <label class="chip"><input type="radio" name="weather" value="windy"><span>Windy</span></label>
+            </div>
+          </fieldset>
+
+          <div class="suggestion" aria-live="polite">
+            <dl>
+              <div>
+                <dt>Good sports today</dt>
+                <dd id="sports">Running, cycling, tennis</dd>
+              </div>
+              <div>
+                <dt>Bring</dt>
+                <dd id="gear" class="gear">Sunscreen, cap, water bottle</dd>
+              </div>
+            </dl>
+          </div>
+
+          <a class="button" href="plan.html">Make a full plan</a>
+        </div>
+
+        <div class="scene" aria-hidden="true">
+          <svg viewBox="0 0 400 400">
+            <g class="sun">
+              <circle cx="200" cy="170" r="112" fill="none" stroke="var(--sun)" stroke-width="14" stroke-linecap="round" stroke-dasharray="3 36"/>
+              <circle class="sun-fill" cx="200" cy="170" r="78"/>
+            </g>
+            <g class="wind">
+              <path class="drop-stroke" d="M40 150h210a30 30 0 1 0-30-30"/>
+              <path class="drop-stroke" d="M70 215h250a34 34 0 1 1-34 34"/>
+              <path class="drop-stroke" d="M30 280h150a24 24 0 1 1-24 24"/>
+            </g>
+            <g class="rain">
+              <line class="drop-stroke" x1="140" y1="290" x2="130" y2="320"/>
+              <line class="drop-stroke" x1="180" y1="300" x2="170" y2="330"/>
+              <line class="drop-stroke" x1="220" y1="290" x2="210" y2="320"/>
+              <line class="drop-stroke" x1="260" y1="300" x2="250" y2="330"/>
+              <line class="drop-stroke" x1="160" y1="330" x2="150" y2="360"/>
+              <line class="drop-stroke" x1="240" y1="335" x2="230" y2="365"/>
+            </g>
+            <g class="snow">
+              <circle class="drop-fill" cx="140" cy="300" r="7"/>
+              <circle class="drop-fill" cx="185" cy="320" r="7"/>
+              <circle class="drop-fill" cx="230" cy="300" r="7"/>
+              <circle class="drop-fill" cx="270" cy="325" r="7"/>
+              <circle class="drop-fill" cx="160" cy="350" r="7"/>
+              <circle class="drop-fill" cx="215" cy="355" r="7"/>
+            </g>
+            <g class="cloud">
+              <circle class="cloud-fill" cx="140" cy="230" r="48"/>
+              <circle class="cloud-fill" cx="210" cy="205" r="66"/>
+              <circle class="cloud-fill" cx="275" cy="238" r="46"/>
+              <rect class="cloud-fill" x="140" y="235" width="135" height="49" rx="24"/>
+            </g>
+          </svg>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <section class="how" aria-labelledby="how-title">
+    <h2 id="how-title">Three steps to today's plan</h2>
+    <ol>
+      <li>
+        <span class="n" aria-hidden="true">1</span>
+        <h3>Enter the weather</h3>
+        <p>Add your place, what it looks like outside and the temperature in °C.</p>
+      </li>
+      <li>
+        <span class="n" aria-hidden="true">2</span>
+        <h3>See what fits</h3>
+        <p>Get sports that suit the conditions, each with a short reason.</p>
+      </li>
+      <li>
+        <span class="n" aria-hidden="true">3</span>
+        <h3>Pack and go</h3>
+        <p>Tick through the gear list, then head out or stay in.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="closing" aria-labelledby="closing-title">
+    <div class="closing-inner">
+      <h2 id="closing-title">Check the sky. Pick your sport.</h2>
+      <a class="button" href="plan.html">Make today's plan</a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>WeatherFit gives general suggestions only. Use your own judgement about local conditions and what your body can handle.</p>
+  </footer>
+
+  <script>
+    // What to suggest for each kind of weather
+    const advice = {
+      sunny:  { sports: "Running, cycling, tennis",              gear: "Sunscreen, cap, water bottle" },
+      cloudy: { sports: "Jogging, basketball, hiking",            gear: "Water bottle, light jacket" },
+      rainy:  { sports: "Gym workout, indoor swimming, table tennis", gear: "Rain jacket, waterproof shoes, dry clothes" },
+      snowy:  { sports: "Skiing, winter walking, indoor climbing", gear: "Waterproof boots, gloves, warm hat" },
+      windy:  { sports: "Sheltered run, yoga, hiking in the woods", gear: "Windbreaker, sport glasses, headband" }
+    };
+
+    const stage  = document.getElementById("stage");
+    const sports = document.getElementById("sports");
+    const gear   = document.getElementById("gear");
+
+    document.querySelectorAll('input[name="weather"]').forEach(input => {
+      input.addEventListener("change", () => {
+        const weather = input.value;
+        stage.dataset.weather = weather;
+        sports.textContent = advice[weather].sports;
+        gear.textContent = advice[weather].gear;
+      });
+    });
+  </script>
+
+  <!-- three.js 3D weather scene. If it cannot load, the flat SVG scene stays. -->
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+  <script type="module">
+import * as THREE from "three";
+
+const stage  = document.getElementById("stage");
+const holder = document.querySelector(".scene");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+} catch (error) {
+  renderer = null; // no WebGL: the flat SVG stays visible
+}
+
+if (renderer) {
+  holder.classList.add("is-3d");
+  holder.appendChild(renderer.domElement);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+  camera.position.set(0, 0, 11);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.6));
+  const sunlight = new THREE.DirectionalLight(0xffffff, 2.2);
+  sunlight.position.set(3, 5, 6);
+  scene.add(sunlight);
+
+  // Materials share the page's colours (read from the CSS variables)
+  const sunMat   = new THREE.MeshLambertMaterial();
+  const cloudMat = new THREE.MeshLambertMaterial();
+  const dropMat  = new THREE.MeshLambertMaterial();
+
+  const world = new THREE.Group();
+  scene.add(world);
+
+  // ---- Sun: ball + a ring of small rays
+  const sun = new THREE.Group();
+  sun.add(new THREE.Mesh(new THREE.SphereGeometry(1.35, 32, 24), sunMat));
+  const rays = new THREE.Group();
+  for (let i = 0; i < 14; i++) {
+    const ray = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 10), sunMat);
+    const angle = (i / 14) * Math.PI * 2;
+    ray.position.set(Math.cos(angle) * 2.1, Math.sin(angle) * 2.1, 0);
+    rays.add(ray);
+  }
+  sun.add(rays);
+  world.add(sun);
+
+  // ---- Cloud: a few overlapping balls
+  const cloud = new THREE.Group();
+  [[-1.2, -0.1, 0.85], [0, 0.35, 1.15], [1.25, -0.1, 0.85]].forEach(([x, y, r]) => {
+    const puff = new THREE.Mesh(new THREE.SphereGeometry(r, 28, 20), cloudMat);
+    puff.position.set(x, y, 0);
+    cloud.add(puff);
+  });
+  const base = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 20), cloudMat);
+  base.scale.set(2.3, 0.6, 0.95);
+  base.position.set(0, -0.5, 0);
+  cloud.add(base);
+  world.add(cloud);
+
+  // ---- Rain: slanted sticks that loop downwards
+  const rain = new THREE.Group();
+  const drops = [];
+  for (let i = 0; i < 26; i++) {
+    const drop = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.55, 6), dropMat);
+    drop.rotation.z = 0.22;
+    drop.userData = { x: (Math.random() - 0.5) * 3.4, z: (Math.random() - 0.5) * 1.4, offset: Math.random(), speed: 0.9 + Math.random() * 0.5 };
+    rain.add(drop);
+    drops.push(drop);
+  }
+  world.add(rain);
+
+  // ---- Snow: small balls that sway as they fall
+  const snow = new THREE.Group();
+  const flakes = [];
+  for (let i = 0; i < 28; i++) {
+    const flake = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), dropMat);
+    flake.userData = { x: (Math.random() - 0.5) * 3.4, z: (Math.random() - 0.5) * 1.4, offset: Math.random(), speed: 0.25 + Math.random() * 0.2, sway: Math.random() * 6 };
+    snow.add(flake);
+    flakes.push(flake);
+  }
+  world.add(snow);
+
+  // ---- Wind: three open curls that slowly turn
+  const wind = new THREE.Group();
+  const curls = [];
+  [[-0.2, 1.0, 1.2], [0.3, -0.2, 1.6], [-0.4, -1.4, 1.0]].forEach(([x, y, r], i) => {
+    const curl = new THREE.Mesh(new THREE.TorusGeometry(r, 0.09, 10, 48, Math.PI * 1.45), dropMat);
+    curl.position.set(x, y, 0);
+    curl.userData = { speed: 0.5 + i * 0.25 };
+    wind.add(curl);
+    curls.push(curl);
+  });
+  world.add(wind);
+
+  // Where each object sits (and how big it is) for every weather
+  const layouts = {
+    sunny:  { sun: [0, 0, 1],        cloud: [0, 0, 0],         rain: 0, snow: 0, wind: 0 },
+    cloudy: { sun: [-1.2, 1.0, .7],  cloud: [0.6, -0.5, 1],    rain: 0, snow: 0, wind: 0 },
+    rainy:  { sun: [0, 0, 0],        cloud: [0, 0.9, 1],       rain: 1, snow: 0, wind: 0 },
+    snowy:  { sun: [0, 0, 0],        cloud: [0, 0.9, 1],       rain: 0, snow: 1, wind: 0 },
+    windy:  { sun: [0, 0, 0],        cloud: [1.4, 1.7, .55],   rain: 0, snow: 0, wind: 1 }
+  };
+  let layout = layouts.sunny;
+
+  function applyWeather() {
+    layout = layouts[stage.dataset.weather] || layouts.sunny;
+    const css = getComputedStyle(stage);
+    sunMat.color.set(css.getPropertyValue("--sun").trim());
+    cloudMat.color.set(css.getPropertyValue("--cloud").trim());
+    dropMat.color.set(css.getPropertyValue("--drop").trim());
+  }
+  document.querySelectorAll('input[name="weather"]').forEach(input =>
+    input.addEventListener("change", applyWeather));
+  applyWeather();
+  // start with nothing visible, then grow in
+  [sun, cloud, rain, snow, wind].forEach(group => group.scale.setScalar(0.001));
+
+  // Move the scene a little with the pointer
+  const pointer = { x: 0, y: 0 };
+  window.addEventListener("pointermove", event => {
+    pointer.x = (event.clientX / window.innerWidth - 0.5) * 2;
+    pointer.y = (event.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  function resize() {
+    const size = holder.clientWidth || 300;
+    renderer.setSize(size, size);
+  }
+  new ResizeObserver(resize).observe(holder);
+  resize();
+
+  const clock = new THREE.Clock();
+  const ease = 0.1;
+
+  function grow(group, target) {
+    const next = group.scale.x + (target - group.scale.x) * ease;
+    group.scale.setScalar(Math.max(next, 0.001));
+    group.visible = next > 0.01;
+  }
+
+  function frame() {
+    const t = clock.getElapsedTime();
+    const motion = reduceMotion ? 0 : 1;
+
+    // sun
+    sun.position.x += (layout.sun[0] - sun.position.x) * ease;
+    sun.position.y += (layout.sun[1] - sun.position.y) * ease;
+    grow(sun, layout.sun[2]);
+    rays.rotation.z = t * 0.25 * motion;
+
+    // cloud
+    cloud.position.x += (layout.cloud[0] - cloud.position.x) * ease;
+    cloud.position.y += (layout.cloud[1] - cloud.position.y) * ease;
+    grow(cloud, layout.cloud[2]);
+
+    // weather effects
+    grow(rain, layout.rain);
+    grow(snow, layout.snow);
+    grow(wind, layout.wind);
+
+    drops.forEach(drop => {
+      const d = drop.userData;
+      const p = ((t * d.speed * motion + d.offset) % 1);
+      drop.position.set(d.x - p * 0.4, 0.2 - p * 3.4, d.z);
+      drop.visible = motion ? true : p > 0.3 && p < 0.7;
+    });
+    flakes.forEach(flake => {
+      const d = flake.userData;
+      const p = ((t * d.speed * motion + d.offset) % 1);
+      flake.position.set(d.x + Math.sin(t * motion + d.sway) * 0.25, 0.2 - p * 3.4, d.z);
+    });
+    curls.forEach(curl => {
+      curl.rotation.z = Math.sin(t * curl.userData.speed * motion) * 0.5;
+    });
+
+    // gentle float and pointer parallax
+    world.position.y = Math.sin(t * 0.9) * 0.15 * motion;
+    world.rotation.y += (pointer.x * 0.35 * motion - world.rotation.y) * 0.05;
+    world.rotation.x += (pointer.y * 0.2 * motion - world.rotation.x) * 0.05;
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+  </script>
+</body>
+</html>
