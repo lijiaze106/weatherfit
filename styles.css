@@ -1,0 +1,51 @@
+/* Shared styles for every page */
+
+body {
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  color: #222;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Navigation */
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1.5rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid #999;
+  margin-bottom: 1.5rem;
+}
+.logo { font-weight: bold; font-size: 1.25rem; text-decoration: none; color: #000; }
+.links { display: flex; flex-wrap: wrap; gap: 1rem; list-style: none; margin: 0; padding: 0; }
+.links a[aria-current="page"] { font-weight: bold; text-decoration: none; color: #000; }
+
+/* Content */
+h2 { margin-bottom: .25rem; }
+article { margin-bottom: 1.5rem; }
+
+/* 3D tilt cards (see tilt.js) */
+.tilt {
+  transition: transform .15s ease-out, box-shadow .15s ease-out;
+}
+article.tilt {
+  border: 1px solid #999;
+  padding: 0 1rem;
+  background: #fff;
+}
+article.tilt:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .2);
+}
+
+/* Footer */
+footer {
+  margin-top: 2rem;
+  padding-top: .75rem;
+  border-top: 1px solid #999;
+  font-size: .9rem;
+  color: #555;
+}

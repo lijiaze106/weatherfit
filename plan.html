@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Plan – WeatherFit</title>
+  <meta name="description" content="Choose where you will exercise, the weather and the temperature to get sports and a gear checklist.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="plan.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main>
+    <h1>Your Plan</h1>
+    <p>Tell WeatherFit where you will exercise and what it is like outside. You choose the weather yourself.</p>
+
+    <form id="plan-form" novalidate>
+      <label for="place">Where will you exercise?</label>
+      <select id="place">
+        <option value="">Choose a place</option>
+        <option value="park">Park</option>
+        <option value="campus">Campus field</option>
+        <option value="street">Street</option>
+        <option value="mountain">Mountain</option>
+        <option value="lake">Beach / Lakeside</option>
+        <option value="indoor">Indoor</option>
+      </select>
+      <p class="error" id="place-error" role="alert"></p>
+
+      <label for="weather">Weather</label>
+      <select id="weather">
+        <option value="">Choose the weather</option>
+        <option value="sunny">Sunny</option>
+        <option value="cloudy">Cloudy</option>
+        <option value="rainy">Rainy</option>
+        <option value="snowy">Snowy</option>
+        <option value="windy">Windy</option>
+      </select>
+      <p class="error" id="weather-error" role="alert"></p>
+
+      <label for="temp">Temperature (°C)</label>
+      <input type="number" id="temp" step="any">
+      <p class="error" id="temp-error" role="alert"></p>
+
+      <button type="submit">Get my plan</button>
+    </form>
+
+    <p id="plan-empty">Choose the place, the weather and the temperature, then choose "Get my plan". Your sports and gear list will appear here.</p>
+
+    <section id="plan-result" aria-live="polite" hidden>
+      <h2 id="result-title"></h2>
+      <p id="result-summary"></p>
+      <p id="result-warning" hidden></p>
+
+      <h3>Sports to try</h3>
+      <ul id="sports-result"></ul>
+
+      <h3>Gear checklist</h3>
+      <ul class="checklist" id="gear-result"></ul>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="nav.js"></script>
+  <script src="data.js"></script>
+  <script src="plan.js"></script>
+</body>
+</html>
