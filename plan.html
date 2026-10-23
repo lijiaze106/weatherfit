@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Plan – WeatherFit</title>
-  <meta name="description" content="Choose where you will exercise, the weather and the temperature to get sports and a gear checklist.">
+  <meta name="description" content="Choose where you will exercise, the weather and the temperature to get one clear recommendation, a gear checklist and a report you can save.">
   <script>try{var w=localStorage.getItem("weatherfit-weather");if(w)document.documentElement.dataset.weather=w}catch(e){}</script>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="plan.css">
@@ -61,19 +61,46 @@
       <div class="plan-side">
         <div id="plan-empty" class="panel empty">
           <h2>Your plan appears here</h2>
-          <p>Choose a place, the weather and the temperature, then press "Get my plan". You will see sports that fit and a checklist of what to bring.</p>
+          <p>Choose a place, the weather and the temperature, then press "Get my plan". You will get a clear verdict, one best sport, a gear checklist and a report you can save as a PDF.</p>
         </div>
 
         <section id="plan-result" class="panel" aria-live="polite" hidden>
-          <h2 id="result-title"></h2>
+          <p class="print-only report-head">WeatherFit report · <span id="report-date"></span></p>
+          <h2 id="result-title">Your plan</h2>
           <div id="result-summary" class="pills"></div>
+
+          <div id="verdict" class="verdict" data-level="">
+            <p class="verdict-label" id="verdict-label"></p>
+            <p class="verdict-text" id="verdict-text"></p>
+          </div>
           <p id="result-warning" class="warning" hidden></p>
 
-          <h3>Sports to try</h3>
+          <h3>Your best pick</h3>
+          <div id="best-pick" class="best-pick">
+            <div class="sport-head">
+              <strong id="best-name"></strong>
+              <span class="badge" id="best-badge"></span>
+            </div>
+            <div class="score">
+              <span id="best-score-text"></span>
+              <span class="meter" aria-hidden="true"><span id="best-meter"></span></span>
+            </div>
+            <ul id="best-why" class="why"></ul>
+            <p id="best-note" class="tip"></p>
+          </div>
+
+          <h3>Other options</h3>
           <ul id="sports-result" class="sports-list"></ul>
 
-          <h3>Gear checklist</h3>
+          <h3>Gear checklist for your best pick</h3>
           <ul id="gear-result" class="checklist"></ul>
+
+          <div class="actions no-print">
+            <button class="btn" type="button" id="save-pdf">Save as PDF</button>
+            <button class="btn ghost" type="button" id="copy-plan">Copy summary</button>
+            <button class="btn ghost" type="button" id="start-over">Start over</button>
+          </div>
+          <p id="action-status" class="action-status no-print" role="status"></p>
         </section>
       </div>
     </div>
