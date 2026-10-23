@@ -5,31 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About – WeatherFit</title>
   <meta name="description" content="What WeatherFit is, who it is for and how it was built.">
+  <script>try{var w=localStorage.getItem("weatherfit-weather");if(w)document.documentElement.dataset.weather=w}catch(e){}</script>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="about.css">
 </head>
 <body>
   <header id="site-header"></header>
 
   <main>
     <h1>About WeatherFit</h1>
+    <p class="lead">A small website that helps you choose a sport that fits today's weather.</p>
 
-    <h2>What it is</h2>
-    <p>WeatherFit helps you choose a sport that fits today's weather. You tell it the place, the weather and the temperature, and it suggests sports and a gear checklist.</p>
+    <div class="about-grid">
+      <section class="panel tilt reveal">
+        <h2>What it is</h2>
+        <p>WeatherFit helps you choose a sport that fits today's weather. You tell it the place, the weather and the temperature, and it suggests sports and a gear checklist.</p>
+      </section>
 
-    <h2>Who it is for</h2>
-    <p>Students and beginners who exercise outdoors and often wonder: "Can I do my sport today, and what should I bring?"</p>
+      <section class="panel tilt reveal">
+        <h2>Who it is for</h2>
+        <p>Students and beginners who exercise outdoors and often wonder: "Can I do my sport today, and what should I bring?"</p>
+      </section>
 
-    <h2>How it was built</h2>
-    <p>The site is made with plain HTML, CSS and JavaScript. There is no server, no database and no account. The weather is typed in by hand, and the suggestions come from a list of sports and simple rules.</p>
+      <section class="panel tilt reveal">
+        <h2>How it was built</h2>
+        <p>The site is made with plain HTML, CSS and JavaScript. There is no server, no database and no account. The weather is chosen by hand, and the suggestions come from a list of sports and simple rules.</p>
+        <p class="tags"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>No API</span></p>
+      </section>
 
-    <h2>Please note</h2>
-    <p>The suggestions are general guidance. Use your own judgement about local conditions and what your body can handle.</p>
+      <section class="panel tilt reveal">
+        <h2>Please note</h2>
+        <p>The suggestions are general guidance. Use your own judgement about local conditions and what your body can handle.</p>
+      </section>
 
-    <h2>Contact</h2>
-    <p>Write the way you want to be contacted here, for example your email address.</p>
+      <section class="panel tilt reveal wide">
+        <h2>Contact</h2>
+        <p>Write the way you want to be contacted here, for example your email address.</p>
+      </section>
+    </div>
   </main>
 
   <footer id="site-footer"></footer>
+
   <script src="nav.js"></script>
+  <script src="sky.js"></script>
+  <script src="effects.js"></script>
 </body>
 </html>

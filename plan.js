@@ -1,39 +1,50 @@
 // Your Plan: read the form, check it, then show sports and a gear checklist.
-// Uses SPORTS, PLACES and WEATHER_GEAR from data.js.
+// Uses SPORTS, PLACES and WEATHER_GEAR from data.js, and Sky from sky.js.
 
-const form      = document.getElementById("plan-form");
-const placeEl   = document.getElementById("place");
-const weatherEl = document.getElementById("weather");
-const tempEl    = document.getElementById("temp");
-const emptyEl   = document.getElementById("plan-empty");
-const resultEl  = document.getElementById("plan-result");
+const form     = document.getElementById("plan-form");
+const tempEl   = document.getElementById("temp");
+const tempValueEl = document.getElementById("temp-value");
+const emptyEl  = document.getElementById("plan-empty");
+const resultEl = document.getElementById("plan-result");
+
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+tempEl.addEventListener("input", () => {
+  tempValueEl.textContent = `${tempEl.value}°C`;
+  setError("temp", "");
+});
+
+// Choosing a weather in the form also changes the sky behind the page
+form.addEventListener("change", event => {
+  if (event.target.name === "weather" && window.Sky) {
+    Sky.set(event.target.value, { save: true });
+  }
+});
 
 // ---------- 1. Validation ----------
-function showError(input, message) {
-  document.getElementById(input.id + "-error").textContent = message;
-  input.setAttribute("aria-invalid", message ? "true" : "false");
+function setError(id, message) {
+  document.getElementById(id + "-error").textContent = message;
+  const field = document.getElementById(id);
+  if (field) field.setAttribute("aria-invalid", message ? "true" : "false");
 }
 
 function readForm() {
-  const place   = placeEl.value;
-  const weather = weatherEl.value;
-  const tempText = tempEl.value.trim();
-  const temp    = Number(tempText);
+  const place   = form.elements.place.value;     // value of the chosen radio button, or ""
+  const weather = form.elements.weather.value;
+  const temp    = Number(tempEl.value);
   let ok = true;
 
-  showError(placeEl, place ? "" : "Choose a place.");
+  setError("place", place ? "" : "Choose where you will exercise.");
   if (!place) ok = false;
 
-  showError(weatherEl, weather ? "" : "Choose the weather.");
+  setError("weather", weather ? "" : "Choose the weather.");
   if (!weather) ok = false;
 
   let tempMessage = "";
-  if (tempText === "" || Number.isNaN(temp)) {
-    tempMessage = "Enter the temperature as a number, for example 22.";
-  } else if (temp < -50 || temp > 60) {
-    tempMessage = "Enter a temperature between -50 and 60 °C.";
+  if (!Number.isFinite(temp) || temp < -50 || temp > 60) {
+    tempMessage = "Choose a temperature between -50 and 60 °C.";
   }
-  showError(tempEl, tempMessage);
+  setError("temp", tempMessage);
   if (tempMessage) ok = false;
 
   return ok ? { place, weather, temp } : null;
@@ -99,19 +110,41 @@ function fillList(listId, items, makeItem) {
   items.forEach((item, index) => list.appendChild(makeItem(item, index)));
 }
 
+function makePill(text) {
+  const span = document.createElement("span");
+  span.className = "pill";
+  span.textContent = text;
+  return span;
+}
+
 function showPlan({ place, weather, temp }) {
   const picks = recommendSports(place, weather, temp);
   const gear  = gearFor(place, weather, temp, picks);
   const warning = warningFor(place, temp);
 
-  document.getElementById("result-title").textContent = `Plan: ${PLACES[place]}`;
-  document.getElementById("result-summary").textContent = `Weather: ${weather}, ${temp}°C`;
+  document.getElementById("result-title").textContent = "Your plan";
+  document.getElementById("result-summary").replaceChildren(
+    makePill(PLACES[place]),
+    makePill(weather.charAt(0).toUpperCase() + weather.slice(1)),
+    makePill(`${temp}°C`)
+  );
 
   fillList("sports-result", picks, pick => {
     const li = document.createElement("li");
+
+    const head = document.createElement("div");
+    head.className = "sport-head";
     const name = document.createElement("strong");
     name.textContent = pick.sport.name;
-    li.append(name, ` (${pick.sport.place}): ${pick.reason}`);
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = pick.sport.place;
+    head.append(name, badge);
+
+    const reason = document.createElement("p");
+    reason.textContent = pick.reason;
+
+    li.append(head, reason);
     return li;
   });
 
@@ -124,7 +157,7 @@ function showPlan({ place, weather, temp }) {
     const label = document.createElement("label");
     label.htmlFor = id;
     label.textContent = item;
-    li.append(box, " ", label);
+    li.append(box, label);
     return li;
   });
 
@@ -134,6 +167,15 @@ function showPlan({ place, weather, temp }) {
 
   emptyEl.hidden = true;
   resultEl.hidden = false;
+  // restart the pop-in animation each time
+  resultEl.style.animation = "none";
+  void resultEl.offsetWidth;
+  resultEl.style.animation = "";
+
+  // On a phone the result is below the form: scroll down to it
+  if (window.innerWidth < 960) {
+    resultEl.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+  }
 }
 
 form.addEventListener("submit", event => {

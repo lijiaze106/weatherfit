@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WeatherFit</title>
   <meta name="description" content="Tell WeatherFit the weather outside and get sports that fit and the gear to bring.">
+  <script>try{var w=localStorage.getItem("weatherfit-weather");if(w)document.documentElement.dataset.weather=w}catch(e){}</script>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="index.css">
 </head>
@@ -12,32 +13,60 @@
   <header id="site-header"></header>
 
   <main>
-    <h1>WeatherFit</h1>
-    <p>Whatever the weather, there's a sport for it. Tell WeatherFit where you are and what the weather is like, and it suggests sports and a checklist of what to bring.</p>
+    <section class="hero">
+      <p class="eyebrow">Weather meets sports</p>
+      <h1>Whatever the weather, there's a sport for it.</h1>
+      <p class="lead">Tell WeatherFit where you will exercise and what it is like outside. It suggests sports that fit and a checklist of what to bring.</p>
 
-    <div id="cube-scene" aria-hidden="true">
-      <div id="cube">
-        <div class="face front"><span>☀️</span>Sunny</div>
-        <div class="face back"><span>☁️</span>Cloudy</div>
-        <div class="face right"><span>🌧️</span>Rainy</div>
-        <div class="face left"><span>❄️</span>Snowy</div>
-        <div class="face top"><span>💨</span>Windy</div>
-        <div class="face bottom"><span>🏃</span>Go</div>
+      <div class="hero-actions">
+        <a class="btn" href="plan.html">Make today's plan</a>
+        <a class="btn ghost" href="sports.html">Browse sports</a>
       </div>
-    </div>
 
-    <p><a href="plan.html">Make today's plan</a></p>
+      <div class="picker" role="group" aria-labelledby="picker-title">
+        <p class="picker-title" id="picker-title">Move over a weather to see the sky change <span class="picker-mood" id="wx-mood" aria-live="polite"></span></p>
+        <div class="wx-row">
+          <button type="button" class="wx tilt" data-weather="sunny" aria-pressed="false"><span class="wx-icon" data-wx-icon="sunny"></span><span class="wx-name">Sunny</span></button>
+          <button type="button" class="wx tilt" data-weather="cloudy" aria-pressed="false"><span class="wx-icon" data-wx-icon="cloudy"></span><span class="wx-name">Cloudy</span></button>
+          <button type="button" class="wx tilt" data-weather="rainy" aria-pressed="false"><span class="wx-icon" data-wx-icon="rainy"></span><span class="wx-name">Rainy</span></button>
+          <button type="button" class="wx tilt" data-weather="snowy" aria-pressed="false"><span class="wx-icon" data-wx-icon="snowy"></span><span class="wx-name">Snowy</span></button>
+          <button type="button" class="wx tilt" data-weather="windy" aria-pressed="false"><span class="wx-icon" data-wx-icon="windy"></span><span class="wx-name">Windy</span></button>
+        </div>
+      </div>
+    </section>
 
-    <h2>How it works</h2>
-    <ol>
-      <li>Choose where you will exercise, the weather and the temperature.</li>
-      <li>See which sports fit, each with a short reason.</li>
-      <li>Check the gear list, then head out or stay in.</li>
-    </ol>
+    <section class="how" aria-labelledby="how-title">
+      <h2 id="how-title">How it works</h2>
+      <ol class="steps">
+        <li class="panel tilt reveal">
+          <span class="step-no">1</span>
+          <h3>Tell it the conditions</h3>
+          <p>Choose where you will exercise, the weather and the temperature.</p>
+        </li>
+        <li class="panel tilt reveal">
+          <span class="step-no">2</span>
+          <h3>See what fits</h3>
+          <p>Get sports that suit the place and the weather, each with a short reason.</p>
+        </li>
+        <li class="panel tilt reveal">
+          <span class="step-no">3</span>
+          <h3>Pack and go</h3>
+          <p>Tick off the gear list, then head out, or stay inside if the weather says so.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="closing panel reveal">
+      <h2>Ready for today's weather?</h2>
+      <a class="btn" href="plan.html">Make today's plan</a>
+    </section>
   </main>
 
   <footer id="site-footer"></footer>
+
   <script src="nav.js"></script>
+  <script src="sky.js"></script>
+  <script src="effects.js"></script>
   <script src="index.js"></script>
 </body>
 </html>

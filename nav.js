@@ -1,10 +1,17 @@
 // Loads nav.html and footer.html into every page.
 // If the browser blocks fetch (for example when you double-click the file),
 // the built-in copies below are used instead, so the page still has navigation.
+// (Keep the copies below the same as nav.html and footer.html.)
 
 const NAV_FALLBACK = `
-<nav>
-  <a class="logo" href="index.html">WeatherFit</a>
+<nav class="site-nav" aria-label="Main">
+  <a class="logo" href="index.html">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="12" cy="12" r="6.5" fill="currentColor"/>
+      <path d="M10 27h14a5.2 5.2 0 0 0 .6-10.4A7.2 7.2 0 0 0 11 17.8 4.6 4.6 0 0 0 10 27z" fill="var(--accent)" stroke="var(--panel-line)" stroke-width="1.5"/>
+    </svg>
+    <span>WeatherFit</span>
+  </a>
   <ul class="links">
     <li><a href="index.html">Home</a></li>
     <li><a href="plan.html">Your Plan</a></li>

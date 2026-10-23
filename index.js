@@ -1,23 +1,27 @@
-// Home page: spin the cube, and tilt it up and down with the mouse.
+// Home page: move the mouse over a weather and the whole page turns into that weather.
+// On a phone there is no hover, so tapping does the same thing.
+// Uses Sky from sky.js.
 
-const cube = document.getElementById("cube");
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const buttons = document.querySelectorAll(".wx");
+const moodEl = document.getElementById("wx-mood");
 
-let rotX = -20;
-let rotY = 30;
-let targetX = -20;
-
-// Mouse height on the screen decides how much the cube tilts
-document.addEventListener("mousemove", event => {
-  targetX = (event.clientY / window.innerHeight - 0.5) * -80;
-});
-
-function frame() {
-  rotY += 0.5;                       // keep spinning
-  rotX += (targetX - rotX) * 0.05;   // ease towards the tilt
-  cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-  requestAnimationFrame(frame);
+function showWeather(name) {
+  Sky.set(name, { save: true });
+  buttons.forEach(button => {
+    const on = button.dataset.weather === name;
+    button.classList.toggle("is-active", on);
+    button.setAttribute("aria-pressed", String(on));
+  });
+  moodEl.textContent = Sky.mood(name);
 }
 
-// People who asked their system for less motion get a still cube
-if (!reduceMotion) frame();
+buttons.forEach(button => {
+  const name = button.dataset.weather;
+  button.addEventListener("pointerenter", event => {
+    if (event.pointerType === "mouse") showWeather(name);
+  });
+  button.addEventListener("focus", () => showWeather(name));
+  button.addEventListener("click", () => showWeather(name));
+});
+
+showWeather(Sky.get());

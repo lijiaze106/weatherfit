@@ -5,23 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sports Guide – WeatherFit</title>
   <meta name="description" content="Short notes on sports for every kind of weather: where, when, what to bring and what to watch for.">
+  <script>try{var w=localStorage.getItem("weatherfit-weather");if(w)document.documentElement.dataset.weather=w}catch(e){}</script>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="sports.css">
 </head>
 <body>
   <header id="site-header"></header>
 
   <main>
     <h1>Sports Guide</h1>
-    <p>A short guide to the sports WeatherFit suggests: where to play, what weather suits them, what to bring and what to watch out for.</p>
+    <p class="lead">A short guide to the sports WeatherFit suggests: where to play, what weather suits them, what to bring and what to watch out for. Pick a weather to filter, and watch the sky change.</p>
 
-    <div id="sports-guide"></div>
+    <div class="filters" id="sports-filters" role="group" aria-label="Filter sports">
+      <button type="button" class="filter is-active" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" class="filter" data-filter="outdoor" aria-pressed="false">Outdoor</button>
+      <button type="button" class="filter" data-filter="indoor" aria-pressed="false">Indoor</button>
+      <button type="button" class="filter" data-filter="sunny" aria-pressed="false"><i class="wx-icon" data-wx-icon="sunny"></i>Sunny</button>
+      <button type="button" class="filter" data-filter="cloudy" aria-pressed="false"><i class="wx-icon" data-wx-icon="cloudy"></i>Cloudy</button>
+      <button type="button" class="filter" data-filter="rainy" aria-pressed="false"><i class="wx-icon" data-wx-icon="rainy"></i>Rainy</button>
+      <button type="button" class="filter" data-filter="snowy" aria-pressed="false"><i class="wx-icon" data-wx-icon="snowy"></i>Snowy</button>
+      <button type="button" class="filter" data-filter="windy" aria-pressed="false"><i class="wx-icon" data-wx-icon="windy"></i>Windy</button>
+    </div>
+    <p class="count" id="sports-count" aria-live="polite"></p>
+
+    <div id="sports-guide" class="sports-grid"></div>
     <noscript><p>This page needs JavaScript to show the sports list.</p></noscript>
   </main>
 
   <footer id="site-footer"></footer>
+
   <script src="nav.js"></script>
+  <script src="sky.js"></script>
   <script src="data.js"></script>
   <script src="sports.js"></script>
-  <script src="tilt.js"></script>
+  <script src="effects.js"></script>
 </body>
 </html>

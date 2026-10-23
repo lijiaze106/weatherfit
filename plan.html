@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Plan – WeatherFit</title>
   <meta name="description" content="Choose where you will exercise, the weather and the temperature to get sports and a gear checklist.">
+  <script>try{var w=localStorage.getItem("weatherfit-weather");if(w)document.documentElement.dataset.weather=w}catch(e){}</script>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="plan.css">
 </head>
@@ -13,56 +14,73 @@
 
   <main>
     <h1>Your Plan</h1>
-    <p>Tell WeatherFit where you will exercise and what it is like outside. You choose the weather yourself.</p>
+    <p class="lead">Tell WeatherFit where you will exercise and what it is like outside. You choose the weather yourself, and the sky behind this page follows your choice.</p>
 
-    <form id="plan-form" novalidate>
-      <label for="place">Where will you exercise?</label>
-      <select id="place">
-        <option value="">Choose a place</option>
-        <option value="park">Park</option>
-        <option value="campus">Campus field</option>
-        <option value="street">Street</option>
-        <option value="mountain">Mountain</option>
-        <option value="lake">Beach / Lakeside</option>
-        <option value="indoor">Indoor</option>
-      </select>
-      <p class="error" id="place-error" role="alert"></p>
+    <div class="plan-grid">
+      <form id="plan-form" class="panel" novalidate>
+        <fieldset id="place-group" class="group">
+          <legend>Where will you exercise?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="place" value="park"><span>Park</span></label>
+            <label class="choice"><input type="radio" name="place" value="campus"><span>Campus field</span></label>
+            <label class="choice"><input type="radio" name="place" value="street"><span>Street</span></label>
+            <label class="choice"><input type="radio" name="place" value="mountain"><span>Mountain</span></label>
+            <label class="choice"><input type="radio" name="place" value="lake"><span>Beach / Lakeside</span></label>
+            <label class="choice"><input type="radio" name="place" value="indoor"><span>Indoor</span></label>
+          </div>
+          <p class="error" id="place-error" role="alert"></p>
+        </fieldset>
 
-      <label for="weather">Weather</label>
-      <select id="weather">
-        <option value="">Choose the weather</option>
-        <option value="sunny">Sunny</option>
-        <option value="cloudy">Cloudy</option>
-        <option value="rainy">Rainy</option>
-        <option value="snowy">Snowy</option>
-        <option value="windy">Windy</option>
-      </select>
-      <p class="error" id="weather-error" role="alert"></p>
+        <fieldset id="weather-group" class="group">
+          <legend>Weather</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="weather" value="sunny"><span><i class="wx-icon" data-wx-icon="sunny"></i>Sunny</span></label>
+            <label class="choice"><input type="radio" name="weather" value="cloudy"><span><i class="wx-icon" data-wx-icon="cloudy"></i>Cloudy</span></label>
+            <label class="choice"><input type="radio" name="weather" value="rainy"><span><i class="wx-icon" data-wx-icon="rainy"></i>Rainy</span></label>
+            <label class="choice"><input type="radio" name="weather" value="snowy"><span><i class="wx-icon" data-wx-icon="snowy"></i>Snowy</span></label>
+            <label class="choice"><input type="radio" name="weather" value="windy"><span><i class="wx-icon" data-wx-icon="windy"></i>Windy</span></label>
+          </div>
+          <p class="error" id="weather-error" role="alert"></p>
+        </fieldset>
 
-      <label for="temp">Temperature (°C)</label>
-      <input type="number" id="temp" step="any">
-      <p class="error" id="temp-error" role="alert"></p>
+        <div class="group">
+          <label class="field-label" for="temp">Temperature</label>
+          <div class="temp-control">
+            <output class="temp-value" id="temp-value" for="temp">22°C</output>
+            <input type="range" id="temp" name="temp" min="-50" max="60" step="1" value="22" aria-describedby="temp-error">
+          </div>
+          <p class="error" id="temp-error" role="alert"></p>
+        </div>
 
-      <button type="submit">Get my plan</button>
-    </form>
+        <button class="btn" type="submit">Get my plan</button>
+      </form>
 
-    <p id="plan-empty">Choose the place, the weather and the temperature, then choose "Get my plan". Your sports and gear list will appear here.</p>
+      <div class="plan-side">
+        <div id="plan-empty" class="panel empty">
+          <h2>Your plan appears here</h2>
+          <p>Choose a place, the weather and the temperature, then press "Get my plan". You will see sports that fit and a checklist of what to bring.</p>
+        </div>
 
-    <section id="plan-result" aria-live="polite" hidden>
-      <h2 id="result-title"></h2>
-      <p id="result-summary"></p>
-      <p id="result-warning" hidden></p>
+        <section id="plan-result" class="panel" aria-live="polite" hidden>
+          <h2 id="result-title"></h2>
+          <div id="result-summary" class="pills"></div>
+          <p id="result-warning" class="warning" hidden></p>
 
-      <h3>Sports to try</h3>
-      <ul id="sports-result"></ul>
+          <h3>Sports to try</h3>
+          <ul id="sports-result" class="sports-list"></ul>
 
-      <h3>Gear checklist</h3>
-      <ul class="checklist" id="gear-result"></ul>
-    </section>
+          <h3>Gear checklist</h3>
+          <ul id="gear-result" class="checklist"></ul>
+        </section>
+      </div>
+    </div>
   </main>
 
   <footer id="site-footer"></footer>
+
   <script src="nav.js"></script>
+  <script src="sky.js"></script>
+  <script src="effects.js"></script>
   <script src="data.js"></script>
   <script src="plan.js"></script>
 </body>

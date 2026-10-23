@@ -10,7 +10,7 @@ Based on `concept.md`, WeatherFit helps students and exercise beginners choose a
 ## MVP user flow
 
 1. Open **Your Plan**.
-2. Enter a place, today’s condition (such as sunny or rainy), and temperature in °C.
+2. Choose a place, today’s condition (such as sunny or rainy), and temperature in °C.
 3. Submit to see suitable sports and a gear checklist.
 4. Adjust the weather and generate another plan.
 
@@ -30,14 +30,14 @@ Design the primary flow for a narrow screen first:
 1. **Weather form**
    - Place name
    - Weather condition selector
-   - Temperature input with °C label
+   - Temperature slider from -50 to 60 °C with the current value displayed
    - “Get my plan” button
 2. **Recommendations**
    - One or more suggested sports, each with a short reason tied to the entered conditions
    - A gear checklist for the selected conditions
 3. **Empty and error states**
    - Before submission, explain what information to enter
-   - Validate missing place, missing condition, and invalid temperature
+   - Validate missing place and missing condition; keep the temperature within the slider’s supported range
    - Keep the submitted weather visible so users can review or edit it
 
 Use clear labels rather than relying on placeholders, and make inputs and buttons comfortable to tap.

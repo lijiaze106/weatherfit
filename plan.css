@@ -1,15 +1,107 @@
 /* Your Plan page only */
 
-label { display: block; font-weight: bold; margin-top: 1rem; }
-input, select { font: inherit; padding: .4rem; width: 100%; max-width: 20rem; }
-button { font: inherit; margin-top: 1.25rem; padding: .5rem 1.25rem; }
+.plan-grid { display: grid; gap: 1.25rem; margin-top: 2rem; align-items: start; }
 
-.error { color: #b00020; margin: .25rem 0 0; min-height: 1.2em; }
+#plan-form .group { margin: 0 0 1.5rem; }
+#plan-form .btn { width: 100%; }
 
-#plan-result { border: 1px solid #333; padding: 0 1rem 1rem; margin-top: 1.5rem; }
-#plan-result[hidden], #plan-empty[hidden], #result-warning[hidden] { display: none; }
-#result-warning { color: #b00020; font-weight: bold; }
+.temp-control { display: grid; gap: .65rem; max-width: 24rem; }
+.temp-value {
+  justify-self: start;
+  padding: .2rem .75rem;
+  background: var(--field);
+  border-radius: 999px;
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+#temp {
+  width: 100%;
+  margin: .25rem 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+#temp:focus-visible { outline: 3px solid currentColor; outline-offset: 5px; }
+#temp::-webkit-slider-runnable-track { height: .5rem; background: var(--field); border-radius: 999px; }
+#temp::-webkit-slider-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: -.375rem;
+  appearance: none;
+  background: var(--accent);
+  border: 3px solid var(--panel-line);
+  border-radius: 50%;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, .2);
+}
+#temp::-moz-range-track { height: .5rem; background: var(--field); border-radius: 999px; }
+#temp::-moz-range-thumb {
+  width: .9rem;
+  height: .9rem;
+  background: var(--accent);
+  border: 3px solid var(--panel-line);
+  border-radius: 50%;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, .2);
+}
 
-.checklist { list-style: none; padding: 0; }
-.checklist label { display: inline; font-weight: normal; margin-top: 0; }
-.checklist input { width: auto; }
+.plan-side { position: relative; }
+.empty h2 { margin-bottom: .75rem; }
+.empty p { margin: 0; }
+
+#plan-empty[hidden], #plan-result[hidden], #result-warning[hidden] { display: none; }
+
+/* ---------- Result ---------- */
+#plan-result { animation: pop .5s cubic-bezier(.2, .9, .3, 1.2); }
+@keyframes pop { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+
+#plan-result h2 { margin-bottom: .75rem; }
+#plan-result h3 { margin: 1.5rem 0 .6rem; }
+
+.pills { display: flex; flex-wrap: wrap; gap: .45rem; }
+.pill {
+  padding: .3rem .8rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: 999px;
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.warning {
+  margin: 1rem 0 0;
+  padding: .75rem 1rem;
+  background: #b3261e;
+  color: #fff;
+  border-radius: .9rem;
+  font-weight: 700;
+}
+
+.sports-list, .checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+
+.sports-list li {
+  padding: .8rem 1rem;
+  background: var(--field);
+  border-radius: 1rem;
+}
+.sports-list .sport-head { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.sports-list strong { font-family: var(--display); font-size: 1.15rem; }
+.badge {
+  padding: .1rem .55rem;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.sports-list p { margin: .2rem 0 0; opacity: .9; }
+
+.checklist { grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .4rem .8rem; }
+.checklist li { display: flex; align-items: center; gap: .55rem; }
+.checklist input { width: 1.2rem; height: 1.2rem; margin: 0; accent-color: var(--accent); }
+.checklist label { cursor: pointer; }
+.checklist input:checked + label { text-decoration: line-through; opacity: .6; }
+
+@media (min-width: 60rem) {
+  .plan-grid { grid-template-columns: minmax(0, 27rem) minmax(0, 1fr); gap: 1.75rem; }
+  .plan-side { position: sticky; top: 6rem; }
+}

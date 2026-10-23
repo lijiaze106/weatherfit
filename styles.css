@@ -1,51 +1,296 @@
-/* Shared styles for every page */
+/* WeatherFit - shared styles for every page.
+   The whole page changes colour with the weather: sky.js sets <html data-weather="...">
+   and the variables below change with it. */
+
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap");
+
+/* Registering the colours lets the browser fade smoothly from one weather to the next */
+@property --sky-top    { syntax: "<color>"; inherits: true; initial-value: #5db7f0; }
+@property --sky-bottom { syntax: "<color>"; inherits: true; initial-value: #ffe6a8; }
+@property --ink        { syntax: "<color>"; inherits: true; initial-value: #0c2236; }
+@property --panel      { syntax: "<color>"; inherits: true; initial-value: rgba(255, 255, 255, 0.46); }
+@property --panel-line { syntax: "<color>"; inherits: true; initial-value: rgba(255, 255, 255, 0.7); }
+@property --field      { syntax: "<color>"; inherits: true; initial-value: rgba(255, 255, 255, 0.7); }
+@property --accent     { syntax: "<color>"; inherits: true; initial-value: #ff7a1a; }
+@property --accent-ink { syntax: "<color>"; inherits: true; initial-value: #2b1300; }
+
+:root {
+  --sky-top: #5db7f0;
+  --sky-bottom: #ffe6a8;
+  --ink: #0c2236;
+  --panel: rgba(255, 255, 255, 0.46);
+  --panel-line: rgba(255, 255, 255, 0.7);
+  --field: rgba(255, 255, 255, 0.7);
+  --accent: #ff7a1a;
+  --accent-ink: #2b1300;
+
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --text: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius: 1.25rem;
+}
+
+html[data-weather="cloudy"] {
+  --sky-top: #8fa3b5; --sky-bottom: #dfe6ec; --ink: #14212d;
+  --panel: rgba(255, 255, 255, 0.5); --panel-line: rgba(255, 255, 255, 0.75); --field: rgba(255, 255, 255, 0.72);
+  --accent: #2f4f73; --accent-ink: #ffffff;
+}
+html[data-weather="rainy"] {
+  --sky-top: #101d2e; --sky-bottom: #3b5873; --ink: #eef5fc;
+  --panel: rgba(8, 18, 32, 0.5); --panel-line: rgba(180, 210, 240, 0.28); --field: rgba(255, 255, 255, 0.1);
+  --accent: #8cc8ff; --accent-ink: #06121f;
+}
+html[data-weather="snowy"] {
+  --sky-top: #a3bad1; --sky-bottom: #e2ecf5; --ink: #12263a;
+  --panel: rgba(255, 255, 255, 0.6); --panel-line: rgba(255, 255, 255, 0.9); --field: rgba(255, 255, 255, 0.8);
+  --accent: #2b6cb0; --accent-ink: #ffffff;
+}
+html[data-weather="windy"] {
+  --sky-top: #3f9d8a; --sky-bottom: #cfeee0; --ink: #082a22;
+  --panel: rgba(255, 255, 255, 0.42); --panel-line: rgba(255, 255, 255, 0.7); --field: rgba(255, 255, 255, 0.7);
+  --accent: #0b6b57; --accent-ink: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  transition: --sky-top .9s ease, --sky-bottom .9s ease, --ink .9s ease, --panel .9s ease,
+              --panel-line .9s ease, --field .9s ease, --accent .9s ease, --accent-ink .9s ease;
+  background: var(--sky-bottom) linear-gradient(180deg, var(--sky-top), var(--sky-bottom)) fixed;
+  color: var(--ink);
+  scroll-behavior: smooth;
+  scroll-padding-top: 6.5rem;     /* keeps focused items from hiding under the sticky menu */
+}
 
 body {
-  font-family: system-ui, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--text);
+  font-size: 1.0625rem;
   line-height: 1.6;
-  color: #222;
-  max-width: 44rem;
-  margin: 0 auto;
-  padding: 1rem;
+  padding-bottom: 6rem;          /* room for the bottom bar on phones */
 }
 
-/* Navigation */
-nav {
+/* the weather canvas sits behind everything */
+#sky {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+h1, h2, h3 {
+  font-family: var(--display);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+h1 { font-size: clamp(2.4rem, 7vw, 4.6rem); font-weight: 800; margin-bottom: 1rem; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0 0 1rem; }
+a { color: inherit; }
+
+:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+
+main, #site-header, #site-footer {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+main { padding-block: 2.5rem 3rem; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: .3rem .8rem;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.lead { font-size: clamp(1.1rem, 2.4vw, 1.35rem); max-width: 38rem; }
+
+/* ---------- Navigation ---------- */
+#site-header { position: sticky; top: .75rem; z-index: 20; padding-top: .75rem; }
+
+.site-nav {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: .5rem 1.5rem;
-  padding-bottom: .75rem;
-  border-bottom: 1px solid #999;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  padding: .55rem .6rem .55rem 1.1rem;
+  /* the panel colour over a solid base, so page content never shows through the menu */
+  background: linear-gradient(var(--panel), var(--panel)),
+              color-mix(in srgb, var(--sky-bottom) 75%, transparent);
+  border: 1px solid var(--panel-line);
+  border-radius: 999px;
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .12);
 }
-.logo { font-weight: bold; font-size: 1.25rem; text-decoration: none; color: #000; }
-.links { display: flex; flex-wrap: wrap; gap: 1rem; list-style: none; margin: 0; padding: 0; }
-.links a[aria-current="page"] { font-weight: bold; text-decoration: none; color: #000; }
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+.logo .mark { width: 1.9rem; height: 1.9rem; }
+.links { display: flex; gap: .25rem; margin: 0; padding: 0; list-style: none; }
+.links a {
+  display: block;
+  padding: .5rem 1rem;
+  border-radius: 999px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color .2s ease;
+}
+.links a:hover { background: var(--panel-line); }
+.links a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
 
-/* Content */
-h2 { margin-bottom: .25rem; }
-article { margin-bottom: 1.5rem; }
+/* ---------- Glass panels, buttons ---------- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, .1);
+}
 
-/* 3D tilt cards (see tilt.js) */
+.btn {
+  display: inline-block;
+  padding: .95rem 1.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 700 1rem/1 var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .18);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.btn:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(0, 0, 0, .22); }
+.btn.ghost {
+  background: transparent;
+  color: inherit;
+  border: 2px solid currentColor;
+  box-shadow: none;
+}
+
+/* ---------- 3D tilt and glare (effects.js) ---------- */
 .tilt {
-  transition: transform .15s ease-out, box-shadow .15s ease-out;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform .18s ease-out, box-shadow .2s ease;
+  will-change: transform;
 }
-article.tilt {
-  border: 1px solid #999;
-  padding: 0 1rem;
-  background: #fff;
+.tilt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, .35), transparent 55%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
 }
-article.tilt:hover {
-  box-shadow: 0 10px 24px rgba(0, 0, 0, .2);
+.tilt.is-tilting::after { opacity: 1; }
+.tilt.is-tilting { box-shadow: 0 22px 44px rgba(0, 0, 0, .22); }
+
+/* ---------- Scroll reveal (effects.js) ---------- */
+.js-reveal .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+.js-reveal .reveal.in { opacity: 1; transform: none; }
+
+/* ---------- Weather icons ---------- */
+.wx-icon { display: inline-block; width: 1.6em; height: 1.6em; vertical-align: middle; }
+.wx-icon svg { display: block; width: 100%; height: 100%; }
+
+/* ---------- Forms (used on Your Plan) ---------- */
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+legend, label.field-label { display: block; padding: 0; margin-bottom: .6rem; font-weight: 700; }
+
+.choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: .5rem; }
+.choice { position: relative; display: flex; }
+.choice input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.choice span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  min-height: 3rem;
+  padding: .55rem .8rem;
+  background: var(--field);
+  border: 2px solid transparent;
+  border-radius: 1rem;
+  font-weight: 500;
+  text-align: center;
+  transition: background-color .2s ease, transform .2s ease, border-color .2s ease;
+}
+.choice:hover span { transform: translateY(-2px); border-color: var(--panel-line); }
+.choice input:checked + span { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.choice input:focus-visible + span { outline: 3px solid currentColor; outline-offset: 3px; }
+.choice .wx-icon { width: 1.4em; height: 1.4em; }
+
+.error { min-height: 1.3em; margin: .4rem 0 0; font-size: .95rem; font-weight: 700; color: #b3261e; }
+html[data-weather="rainy"] .error { color: #ffb4ab; }
+
+/* ---------- Footer ---------- */
+#site-footer { padding-block: 1.5rem 2rem; }
+#site-footer p {
+  max-width: 46rem;
+  margin: 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--panel-line);
+  font-size: .92rem;
+  opacity: .8;
 }
 
-/* Footer */
-footer {
-  margin-top: 2rem;
-  padding-top: .75rem;
-  border-top: 1px solid #999;
-  font-size: .9rem;
-  color: #555;
+/* ---------- Phones: logo on top, the four links in a bar at the bottom ---------- */
+@media (max-width: 47.99rem) {
+  /* on phones the top bar scrolls away; the links live in the bottom bar */
+  #site-header { position: static; }
+
+  /* no blur on the nav itself: a blurred parent would stop the bottom bar from staying fixed */
+  .site-nav {
+    padding: .5rem 1rem;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .links {
+    position: fixed;
+    z-index: 30;
+    left: .75rem;
+    right: .75rem;
+    bottom: .75rem;
+    padding: .35rem;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 1.3rem;
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+  }
+  .links li { flex: 1; }
+  .links a { padding: .8rem .25rem; text-align: center; font-size: .82rem; border-radius: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; transition: none; }
+  .tilt, .btn, .choice span, .links a { transition: none; }
+  .js-reveal .reveal { opacity: 1; transform: none; transition: none; }
 }
