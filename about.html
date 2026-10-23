@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About – WeatherFit</title>
-  <meta name="description" content="What WeatherFit is, who it is for and how it was built.">
+  <meta name="description" content="What WeatherFit is, who it is for, the user stories behind it and how it was built.">
   <script>try{var w=localStorage.getItem("weatherfit-weather");if(w)document.documentElement.dataset.weather=w}catch(e){}</script>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="about.css">
@@ -15,6 +15,61 @@
   <main>
     <h1>About WeatherFit</h1>
     <p class="lead">A small website that helps you choose a sport that fits today's weather.</p>
+
+    <section class="stories" aria-labelledby="stories-title">
+      <h2 id="stories-title">User stories</h2>
+      <p class="stories-intro">A user story says who needs something, what they want and why. These are the stories WeatherFit was built around, and each one links to the page that delivers it.</p>
+
+      <article class="story story-main panel tilt reveal">
+        <p class="story-tag">Main story</p>
+        <p class="story-line"><strong>As a</strong> student who exercises outdoors,</p>
+        <p class="story-line"><strong>I want</strong> to enter today's place, weather and temperature,</p>
+        <p class="story-line"><strong>so that</strong> I know which sports fit and what gear to bring.</p>
+
+        <h3>It works when</h3>
+        <ul class="criteria">
+          <li>I can choose a place and a weather and type a temperature.</li>
+          <li>I get at least three sports, each with a short reason.</li>
+          <li>I get a gear checklist that I can tick off.</li>
+          <li>If something is missing or wrong, the page tells me what to fix.</li>
+        </ul>
+        <a class="story-link" href="plan.html">See it in Your Plan <span aria-hidden="true">→</span></a>
+      </article>
+
+      <div class="story-grid">
+        <article class="story panel tilt reveal">
+          <p class="story-tag">Story 2</p>
+          <p class="story-line"><strong>As a</strong> beginner,</p>
+          <p class="story-line"><strong>I want</strong> to learn which weather and place suits each sport,</p>
+          <p class="story-line"><strong>so that</strong> I can judge for myself whether to go out today.</p>
+          <a class="story-link" href="sports.html">See it in the Sports Guide <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="story panel tilt reveal">
+          <p class="story-tag">Story 3</p>
+          <p class="story-line"><strong>As a</strong> person facing bad weather,</p>
+          <p class="story-line"><strong>I want</strong> an indoor sport when nothing outside fits,</p>
+          <p class="story-line"><strong>so that</strong> I do not skip exercise because of the weather.</p>
+          <a class="story-link" href="plan.html">Try rainy weather in Your Plan <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="story panel tilt reveal">
+          <p class="story-tag">Story 4</p>
+          <p class="story-line"><strong>As a</strong> person who looks after my body,</p>
+          <p class="story-line"><strong>I want</strong> a warning when it is extremely hot or cold,</p>
+          <p class="story-line"><strong>so that</strong> I avoid getting hurt.</p>
+          <a class="story-link" href="plan.html">Try 36°C or -12°C in Your Plan <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="story panel tilt reveal">
+          <p class="story-tag">Story 5</p>
+          <p class="story-line"><strong>As a</strong> person checking my phone before I leave,</p>
+          <p class="story-line"><strong>I want</strong> every page to be clear and easy to use on a small screen,</p>
+          <p class="story-line"><strong>so that</strong> I can plan from anywhere.</p>
+          <a class="story-link" href="index.html">Open the site on your phone <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </section>
 
     <div class="about-grid">
       <section class="panel tilt reveal">
