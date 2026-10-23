@@ -10,8 +10,8 @@ Based on `concept.md`, WeatherFit helps students and exercise beginners choose a
 ## MVP user flow
 
 1. Open **Your Plan**.
-2. Choose a place, today’s condition (such as sunny or rainy), and temperature in °C.
-3. Submit to see suitable sports and a gear checklist.
+2. Optionally get current weather using the device location, or choose the condition (such as sunny or rainy) and temperature in °C manually.
+3. Choose an exercise place and submit to see suitable sports and a gear checklist.
 4. Adjust the weather and generate another plan.
 
 ## Pages
@@ -28,8 +28,9 @@ On phones, use a compact header and a **bottom navigation bar** for the four sec
 Design the primary flow for a narrow screen first:
 
 1. **Weather form**
-   - Place name
-   - Weather condition selector
+   - Exercise place
+   - Current-weather button (optional; requires location permission and an internet connection)
+   - Weather condition selector for manual entry or adjustment
    - Temperature slider from -50 to 60 °C with the current value displayed
    - “Get my plan” button
 2. **Recommendations**
@@ -57,13 +58,14 @@ Keep the first version understandable and predictable. Start with a small set of
 
 ## MVP acceptance criteria
 
-- A user can enter a place, condition, and temperature and receive a plan without an account.
+- A user can manually enter an exercise place, condition, and temperature and receive a plan without an account.
+- A user can optionally load current weather and an approximate city from their location; denial or network failure leaves manual entry available.
 - Results include at least one suggested sport and a relevant gear list.
 - Invalid or incomplete input receives clear feedback.
 - All four pages are reachable on mobile and desktop.
 - The app works without a live weather service.
 
-**Out of scope for the MVP:** automatic weather lookup, accounts, saved plans, social features, and advanced personalization.
+**Out of scope for the MVP:** weather forecasts, accounts, saved plans, social features, and advanced personalization.
 
 
 

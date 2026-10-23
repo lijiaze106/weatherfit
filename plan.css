@@ -4,6 +4,10 @@
 
 #plan-form .group { margin: 0 0 1.5rem; }
 #plan-form .btn { width: 100%; }
+#get-weather { margin: 0 0 .5rem; }
+.weather-note, #weather-status { margin: 0 0 .5rem; font-size: .9rem; }
+#weather-status { min-height: 1.3em; }
+#get-weather:disabled { cursor: wait; opacity: .7; }
 
 .temp-control { display: grid; gap: .65rem; max-width: 24rem; }
 .temp-value {

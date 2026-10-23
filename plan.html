@@ -14,7 +14,7 @@
 
   <main>
     <h1>Your Plan</h1>
-    <p class="lead">Tell WeatherFit where you will exercise and what it is like outside. You choose the weather yourself, and the sky behind this page follows your choice.</p>
+    <p class="lead">Tell WeatherFit where you will exercise and what it is like outside. Load current weather from your location or choose it yourself; the sky follows your weather choice.</p>
 
     <div class="plan-grid">
       <form id="plan-form" class="panel" novalidate>
@@ -33,6 +33,9 @@
 
         <fieldset id="weather-group" class="group">
           <legend>Weather</legend>
+          <button class="btn ghost" id="get-weather" type="button">Get current weather</button>
+          <p class="weather-note">Your coordinates are sent to these services to get weather and an approximate city; WeatherFit does not save them. Weather by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>; city lookup by <a href="https://www.bigdatacloud.com/" target="_blank" rel="noopener noreferrer">BigDataCloud</a>.</p>
+          <p id="weather-status" role="status"></p>
           <div class="choices">
             <label class="choice"><input type="radio" name="weather" value="sunny"><span><i class="wx-icon" data-wx-icon="sunny"></i>Sunny</span></label>
             <label class="choice"><input type="radio" name="weather" value="cloudy"><span><i class="wx-icon" data-wx-icon="cloudy"></i>Cloudy</span></label>

@@ -6,12 +6,131 @@ const tempEl   = document.getElementById("temp");
 const tempValueEl = document.getElementById("temp-value");
 const emptyEl  = document.getElementById("plan-empty");
 const resultEl = document.getElementById("plan-result");
+const getWeatherButton = document.getElementById("get-weather");
+const weatherStatus = document.getElementById("weather-status");
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 tempEl.addEventListener("input", () => {
   tempValueEl.textContent = `${tempEl.value}°C`;
   setError("temp", "");
+});
+
+function weatherFromCode(code, windSpeed) {
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return "snowy";
+  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99].includes(code)) return "rainy";
+  if ([1, 2, 3, 45, 48].includes(code)) return "cloudy";
+  if (windSpeed >= 40) return "windy";
+  if (code === 0) return "sunny";
+  throw new Error("The weather service returned an unsupported weather code.");
+}
+
+function getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Location is not available in this browser."));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: false,
+      timeout: 10000,
+      maximumAge: 300000
+    });
+  });
+}
+
+function locationErrorMessage(error) {
+  if (error instanceof Error && error.message === "Location is not available in this browser.") {
+    return error.message;
+  }
+  if (error && typeof error.code === "number") {
+    if (error.code === 1) return "Location permission was denied. Choose the weather manually instead.";
+    if (error.code === 2) return "Your location could not be determined. Try again or choose the weather manually.";
+    if (error.code === 3) return "Getting your location took too long. Try again or choose the weather manually.";
+  }
+  return error instanceof Error ? error.message : "Could not get your location. Choose the weather manually.";
+}
+
+async function fetchJson(url) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new Error("The weather service is unavailable. Please try again.");
+    return await response.json();
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
+getWeatherButton.addEventListener("click", async () => {
+  getWeatherButton.disabled = true;
+  weatherStatus.textContent = "Getting your location and current weather…";
+
+  try {
+    if (!window.isSecureContext) {
+      throw new Error("Location requires HTTPS or localhost. Choose the weather manually.");
+    }
+    const position = await getCurrentPosition();
+    const { latitude, longitude } = position.coords;
+    const url = new URL("https://api.open-meteo.com/v1/forecast");
+    url.search = new URLSearchParams({
+      latitude: String(latitude),
+      longitude: String(longitude),
+      current: "temperature_2m,weather_code,wind_speed_10m",
+      timezone: "auto"
+    });
+    const locationUrl = new URL("https://api.bigdatacloud.net/data/reverse-geocode-client");
+    locationUrl.search = new URLSearchParams({
+      latitude: String(latitude),
+      longitude: String(longitude),
+      localityLanguage: "zh"
+    });
+    const [data, location] = await Promise.all([
+      fetchJson(url),
+      fetchJson(locationUrl).catch(() => null)
+    ]);
+    const current = data.current;
+    if (!current || !Number.isFinite(current.temperature_2m) ||
+        !Number.isInteger(current.weather_code) || !Number.isFinite(current.wind_speed_10m)) {
+      throw new Error("The weather service returned incomplete data. Please try again.");
+    }
+
+    const weather = weatherFromCode(current.weather_code, current.wind_speed_10m);
+    const minimum = Number(tempEl.min);
+    const maximum = Number(tempEl.max);
+    const temperature = Math.round(current.temperature_2m);
+    tempEl.value = String(Math.max(minimum, Math.min(maximum, temperature)));
+    tempValueEl.textContent = `${tempEl.value}°C`;
+    setError("temp", "");
+
+    const weatherRadio = form.querySelector(`input[name="weather"][value="${weather}"]`);
+    if (!weatherRadio) throw new Error("Could not match the current weather to a plan option.");
+    weatherRadio.checked = true;
+    setError("weather", "");
+    if (window.Sky) Sky.set(weather, { save: true });
+
+    const limitNote = temperature < minimum || temperature > maximum
+      ? ` Temperature was outside the slider range and set to ${tempEl.value}°C.`
+      : "";
+    const city = location && (
+      location.city || location.locality || location.principalSubdivision || location.countryName
+    );
+    weatherStatus.textContent =
+      `${city || "Nearby city unavailable"} · Current weather: ${weather}, ${tempEl.value}°C. Choose an exercise location and get your plan.${limitNote}`;
+  } catch (error) {
+    if (error && error.name === "AbortError") {
+      weatherStatus.textContent = "The weather request timed out. Please try again or choose the weather manually.";
+    } else if (error && typeof error.code === "number") {
+      weatherStatus.textContent = locationErrorMessage(error);
+    } else {
+      weatherStatus.textContent = error instanceof Error
+        ? `${error.message} You can choose the weather manually.`
+        : "Could not get current weather. You can choose it manually.";
+    }
+  } finally {
+    getWeatherButton.disabled = false;
+  }
 });
 
 // Choosing a weather in the form also changes the sky behind the page
