@@ -28,8 +28,10 @@
       const box = element.getBoundingClientRect();
       const x = (event.clientX - box.left) / box.width;    // 0 to 1
       const y = (event.clientY - box.top) / box.height;
+      const inNavigation = element.closest(".site-nav");
+      const tilt = inNavigation ? 6 : 12;
       element.style.transform =
-        `perspective(800px) rotateX(${(0.5 - y) * 12}deg) rotateY(${(x - 0.5) * 14}deg) scale(1.02)`;
+        `perspective(800px) rotateX(${(0.5 - y) * tilt}deg) rotateY(${(x - 0.5) * tilt * 1.17}deg) translateY(${inNavigation ? 1 : 0}px) scale(${inNavigation ? 0.98 : 1.02})`;
       element.style.setProperty("--mx", (x * 100) + "%");
       element.style.setProperty("--my", (y * 100) + "%");
       element.classList.add("is-tilting");

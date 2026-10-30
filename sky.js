@@ -18,6 +18,7 @@
 
   const NAMES = ["sunny", "cloudy", "rainy", "snowy", "windy"];
   const STORE_KEY = "weatherfit-weather";
+  const PLAN_STORE_KEY = "weatherfit-plan-weather";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const MOODS = {
@@ -63,6 +64,13 @@
   function readSaved() {
     try {
       const saved = localStorage.getItem(STORE_KEY);
+      return NAMES.includes(saved) ? saved : null;
+    } catch (error) { return null; }
+  }
+
+  function readPlanWeather() {
+    try {
+      const saved = localStorage.getItem(PLAN_STORE_KEY);
       return NAMES.includes(saved) ? saved : null;
     } catch (error) { return null; }
   }
@@ -615,12 +623,21 @@
     if (options && options.save) {
       try { localStorage.setItem(STORE_KEY, next); } catch (error) { /* storage blocked: ignore */ }
     }
+    if (options && options.plan) {
+      try { localStorage.setItem(PLAN_STORE_KEY, next); } catch (error) { /* storage blocked: ignore */ }
+    }
+  }
+
+  function clearPlanWeather() {
+    try { localStorage.removeItem(PLAN_STORE_KEY); } catch (error) { /* storage blocked: ignore */ }
   }
 
   window.Sky = {
     names: NAMES,
     set,
     get: () => name,
+    getPlanWeather: readPlanWeather,
+    clearPlanWeather,
     mood: n => MOODS[n] || "",
     icon
   };

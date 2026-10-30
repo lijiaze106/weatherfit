@@ -113,7 +113,7 @@ getWeatherButton.addEventListener("click", async () => {
     if (!weatherRadio) throw new Error("Could not match the current weather to a plan option.");
     weatherRadio.checked = true;
     setError("weather", "");
-    if (window.Sky) Sky.set(weather, { save: true });
+    if (window.Sky) Sky.set(weather, { save: true, plan: true });
 
     const limitNote = temperature < minimum || temperature > maximum
       ? ` Temperature was outside the slider range and set to ${tempEl.value}°C.`
@@ -141,7 +141,7 @@ getWeatherButton.addEventListener("click", async () => {
 // Choosing a weather in the form also changes the sky behind the page
 form.addEventListener("change", event => {
   if (event.target.name === "weather" && window.Sky) {
-    Sky.set(event.target.value, { save: true });
+    Sky.set(event.target.value, { save: true, plan: true });
   }
 });
 

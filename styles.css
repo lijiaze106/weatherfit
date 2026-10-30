@@ -139,11 +139,15 @@ main { padding-block: 2.5rem 3rem; }
   display: inline-flex;
   align-items: center;
   gap: .55rem;
+  padding: .2rem .55rem;
+  border-radius: 999px;
   font-family: var(--display);
   font-weight: 800;
   font-size: 1.3rem;
   letter-spacing: -0.03em;
   text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+  transition: box-shadow .2s ease;
 }
 .logo .mark { width: 1.9rem; height: 1.9rem; }
 .links { display: flex; gap: .25rem; margin: 0; padding: 0; list-style: none; }
@@ -153,10 +157,26 @@ main { padding-block: 2.5rem 3rem; }
   border-radius: 999px;
   font-weight: 500;
   text-decoration: none;
-  transition: background-color .2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+  transition: background-color .2s ease, box-shadow .2s ease;
 }
 .links a:hover { background: var(--panel-line); }
 .links a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.links a:hover, .links a:focus-visible, .links a:active {
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 55%, transparent),
+              0 4px 14px rgba(0, 0, 0, .16),
+              inset 0 2px 8px rgba(0, 0, 0, .14);
+}
+.logo:hover, .logo:focus-visible, .logo:active {
+  outline: none;
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 55%, transparent),
+              0 4px 14px rgba(0, 0, 0, .16),
+              inset 0 2px 8px rgba(0, 0, 0, .14);
+}
+.links a:focus-visible, .links a:active, .logo:focus-visible, .logo:active {
+  transform: translateY(2px) scale(.96);
+}
 
 /* ---------- Glass panels, buttons ---------- */
 .panel {
@@ -209,6 +229,17 @@ main { padding-block: 2.5rem 3rem; }
 }
 .tilt.is-tilting::after { opacity: 1; }
 .tilt.is-tilting { box-shadow: 0 22px 44px rgba(0, 0, 0, .22); }
+.site-nav .links a.is-tilting {
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 55%, transparent),
+              0 4px 14px rgba(0, 0, 0, .16),
+              inset 0 2px 8px rgba(0, 0, 0, .14);
+}
+.site-nav .logo.is-tilting {
+  outline: none;
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 55%, transparent),
+              0 4px 14px rgba(0, 0, 0, .16),
+              inset 0 2px 8px rgba(0, 0, 0, .14);
+}
 
 /* ---------- Scroll reveal (effects.js) ---------- */
 .js-reveal .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
