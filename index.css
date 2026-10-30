@@ -9,6 +9,7 @@
   padding-block: 2rem 3rem;
 }
 .hero h1 { max-width: 15ch; margin-bottom: 1.25rem; }
+.hero .lead { max-width: 48rem; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .75rem; }
 
 /* ---------- The weather picker ---------- */
