@@ -9,6 +9,25 @@
 #weather-status { min-height: 1.3em; }
 #get-weather:disabled { cursor: wait; opacity: .7; }
 
+.text-input {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  min-height: 3rem;
+  padding: .6rem 1rem;
+  background: var(--field);
+  color: inherit;
+  border: 2px solid transparent;
+  border-radius: 1rem;
+  font: inherit;
+}
+.text-input::placeholder { color: inherit; opacity: .6; }
+.text-input:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+.text-input[aria-invalid="true"] { border-color: #b3261e; }
+.hint { margin: .4rem 0 0; font-size: .9rem; opacity: .85; }
+.save-status { margin: .9rem 0 0; font-size: .95rem; }
+.save-status a { font-weight: 700; text-underline-offset: 3px; }
+
 .temp-control { display: grid; gap: .65rem; max-width: 24rem; }
 .temp-value {
   justify-self: start;

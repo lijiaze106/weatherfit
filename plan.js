@@ -1,7 +1,8 @@
 // Your Plan: read the form, check it, then show sports and a gear checklist.
-// Uses SPORTS, PLACES and WEATHER_GEAR from data.js, and Sky from sky.js.
+// Uses SPORTS, PLACES and WEATHER_GEAR from data.js, Sky from sky.js and PlanStore from store.js.
 
 const form     = document.getElementById("plan-form");
+const nameEl   = document.getElementById("name");
 const tempEl   = document.getElementById("temp");
 const tempValueEl = document.getElementById("temp-value");
 const emptyEl  = document.getElementById("plan-empty");
@@ -10,6 +11,10 @@ const getWeatherButton = document.getElementById("get-weather");
 const weatherStatus = document.getElementById("weather-status");
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Remember the last name used on this device
+nameEl.value = PlanStore.lastName();
+nameEl.addEventListener("input", () => setError("name", ""));
 
 tempEl.addEventListener("input", () => {
   tempValueEl.textContent = `${tempEl.value}°C`;
@@ -148,10 +153,14 @@ function setError(id, message) {
 }
 
 function readForm() {
+  const name    = nameEl.value.trim().replace(/\s+/g, " ");
   const place   = form.elements.place.value;     // value of the chosen radio button, or ""
   const weather = form.elements.weather.value;
   const temp    = Number(tempEl.value);
   let ok = true;
+
+  setError("name", name ? "" : "Enter your name so your plan can be saved.");
+  if (!name) ok = false;
 
   setError("place", place ? "" : "Choose where you will exercise.");
   if (!place) ok = false;
@@ -166,7 +175,7 @@ function readForm() {
   setError("temp", tempMessage);
   if (tempMessage) ok = false;
 
-  return ok ? { place, weather, temp } : null;
+  return ok ? { name, place, weather, temp } : null;
 }
 
 // ---------- 2. Recommendation rules ----------
@@ -283,6 +292,34 @@ function buildPlan(place, weather, temp) {
 // ---------- 3. Showing the result ----------
 let currentPlan = null;
 
+// Every plan is added to the history of the person who typed the name
+function saveToHistory(plan) {
+  const saved = PlanStore.add({
+    name: plan.name,
+    savedAt: new Date().toISOString(),
+    place: plan.place,
+    weather: plan.weather,
+    temp: plan.temp,
+    level: plan.level,
+    verdict: plan.label.split(":")[0],
+    sport: plan.best.sport.name,
+    score: plan.best.score
+  });
+
+  const status = document.getElementById("save-status");
+  status.replaceChildren();
+  if (saved) {
+    const strong = document.createElement("strong");
+    strong.textContent = plan.name;
+    const link = document.createElement("a");
+    link.href = "history.html";
+    link.textContent = "View history";
+    status.append("Saved to the history of ", strong, ". ", link);
+  } else {
+    status.textContent = "This plan could not be saved because the browser blocks storage. You can still save it as a PDF.";
+  }
+}
+
 function fillList(listId, items, makeItem) {
   const list = document.getElementById(listId);
   list.replaceChildren();
@@ -298,12 +335,14 @@ function makePill(text) {
 
 function showPlan(values) {
   const plan = buildPlan(values.place, values.weather, values.temp);
+  plan.name = values.name;
   currentPlan = plan;
   const weatherName = plan.weather.charAt(0).toUpperCase() + plan.weather.slice(1);
 
   document.getElementById("result-summary").replaceChildren(
     makePill(PLACES[plan.place]), makePill(weatherName), makePill(`${plan.temp}°C`)
   );
+  document.getElementById("report-name").textContent = plan.name;
   document.getElementById("report-date").textContent = new Date().toLocaleDateString("en-GB", {
     day: "numeric", month: "long", year: "numeric"
   });
@@ -361,6 +400,8 @@ function showPlan(values) {
     return li;
   });
 
+  saveToHistory(plan);
+
   document.getElementById("action-status").textContent = "";
   emptyEl.hidden = true;
   resultEl.hidden = false;
@@ -378,6 +419,7 @@ function summaryText(plan) {
   const weatherName = plan.weather.charAt(0).toUpperCase() + plan.weather.slice(1);
   const lines = [
     "WeatherFit report",
+    `Name: ${plan.name}`,
     `Place: ${PLACES[plan.place]} | Weather: ${weatherName} | Temperature: ${plan.temp}°C`,
     "",
     `Verdict: ${plan.label}`,
@@ -413,8 +455,9 @@ document.getElementById("copy-plan").addEventListener("click", async () => {
 
 document.getElementById("start-over").addEventListener("click", () => {
   form.reset();
+  nameEl.value = PlanStore.lastName();
   tempValueEl.textContent = `${tempEl.value}°C`;
-  ["place", "weather", "temp"].forEach(id => setError(id, ""));
+  ["name", "place", "weather", "temp"].forEach(id => setError(id, ""));
   currentPlan = null;
   resultEl.hidden = true;
   emptyEl.hidden = false;

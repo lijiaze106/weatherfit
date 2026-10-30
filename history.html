@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History – WeatherFit</title>
+  <meta name="description" content="Look back at the plans saved under your name: sports, places, weather and how often you exercised.">
+  <script>try{var w=localStorage.getItem("weatherfit-weather");if(w)document.documentElement.dataset.weather=w}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="history.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main>
+    <h1>History</h1>
+    <p class="lead">Every plan you make in Your Plan is saved under your name. Choose a name to look back at its exercise records.</p>
+
+    <div id="history-empty" class="panel empty" hidden>
+      <h2>No plans saved yet</h2>
+      <p>Make your first plan and it will appear here.</p>
+      <a class="btn" href="plan.html">Make a plan</a>
+    </div>
+
+    <div id="history-content">
+      <section class="panel filter" aria-label="Choose a person">
+        <label class="field-label" for="who">Whose history?</label>
+        <select id="who" class="text-input"></select>
+      </section>
+
+      <ul class="stats" aria-label="Summary">
+        <li class="panel"><span class="stat-value" id="stat-count">0</span><span class="stat-label">Plans saved</span></li>
+        <li class="panel"><span class="stat-value" id="stat-sport">–</span><span class="stat-label">Most picked sport</span></li>
+        <li class="panel"><span class="stat-value" id="stat-last">–</span><span class="stat-label">Latest plan</span></li>
+      </ul>
+
+      <h2 class="list-title">Exercise records</h2>
+      <ul id="history-list" class="records"></ul>
+
+      <div class="actions">
+        <button class="btn ghost" type="button" id="export-csv">Download CSV</button>
+        <button class="btn ghost danger" type="button" id="delete-shown">Delete these records</button>
+      </div>
+      <p id="history-status" class="status" role="status"></p>
+    </div>
+
+    <p class="note">History is saved only in this browser on this device. It is not sent to a server, so clearing the browser's site data removes it.</p>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="nav.js"></script>
+  <script src="sky.js"></script>
+  <script src="effects.js"></script>
+  <script src="data.js"></script>
+  <script src="store.js"></script>
+  <script src="history.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+/* History page only */
+
+#history-empty[hidden], #history-content[hidden] { display: none; }
+.empty { margin-top: 2rem; }
+.empty h2 { margin-bottom: .75rem; }
+.empty p { margin: 0 0 1.25rem; }
+
+.filter { margin-top: 2rem; }
+.filter .field-label { margin-bottom: .6rem; }
+.text-input {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  min-height: 3rem;
+  padding: .6rem 1rem;
+  background: var(--field);
+  color: inherit;
+  border: 2px solid transparent;
+  border-radius: 1rem;
+  font: inherit;
+}
+.text-input:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+
+/* ---------- Summary tiles ---------- */
+.stats { display: grid; gap: 1rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
+.stats li { display: flex; flex-direction: column; gap: .25rem; padding: 1.1rem 1.25rem; }
+.stat-value { font: 800 1.6rem/1.15 var(--display); overflow-wrap: anywhere; }
+.stat-label { font-size: .9rem; font-weight: 700; opacity: .85; }
+
+.list-title { margin: 2rem 0 .9rem; font-size: 1.6rem; }
+
+/* ---------- Records ---------- */
+.records { display: grid; gap: .9rem; margin: 0; padding: 0; list-style: none; }
+.record {
+  display: grid;
+  gap: .4rem;
+  padding: 1rem 1.25rem;
+  border-left: .45rem solid var(--accent);
+}
+.record[data-level="go"]   { border-left-color: #1e7a3c; }
+.record[data-level="ok"]   { border-left-color: #b26a00; }
+.record[data-level="stay"] { border-left-color: #b3261e; }
+
+.record-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem .8rem; }
+.record-head strong { font: 800 1.3rem/1.2 var(--display); }
+.record-verdict { font-weight: 700; font-size: .9rem; opacity: .9; }
+.record-meta { margin: 0; font-size: .92rem; opacity: .85; }
+
+.tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .2rem; }
+.tag {
+  padding: .2rem .75rem;
+  background: var(--field);
+  border-radius: 999px;
+  font-size: .85rem;
+  font-weight: 700;
+}
+.record .btn { justify-self: start; margin-top: .4rem; }
+.btn.small { min-height: 0; padding: .45rem 1.1rem; font-size: .9rem; }
+
+.actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.5rem; }
+.btn.danger { border-color: #b3261e; }
+html[data-weather="rainy"] .btn.danger { border-color: #ffb4ab; }
+.status { min-height: 1.3em; margin: .75rem 0 0; font-size: .95rem; font-weight: 700; }
+.note { max-width: 40rem; margin: 2rem 0 0; font-size: .92rem; opacity: .85; }
+
+@media (min-width: 48rem) {
+  .stats { grid-template-columns: repeat(3, 1fr); }
+  .record { grid-template-columns: 1fr auto; align-items: center; column-gap: 1.5rem; }
+  .record-head, .record-meta, .tags { grid-column: 1; }
+  .record .btn { grid-column: 2; grid-row: 1 / span 3; margin: 0; }
+}

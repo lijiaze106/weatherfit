@@ -16,6 +16,7 @@ const NAV_FALLBACK = `
     <li><a href="index.html">Home</a></li>
     <li><a href="plan.html">Your Plan</a></li>
     <li><a href="sports.html">Sports Guide</a></li>
+    <li><a href="history.html">History</a></li>
     <li><a href="about.html">About</a></li>
   </ul>
 </nav>`;
