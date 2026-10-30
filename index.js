@@ -23,7 +23,10 @@ buttons.forEach(button => {
     if (event.pointerType === "mouse") showWeather(name);
   });
   button.addEventListener("focus", () => showWeather(name));
-  button.addEventListener("click", () => showWeather(name));
+  button.addEventListener("click", () => {
+    Sky.clearPlanWeather();
+    showWeather(name);
+  });
 });
 
 document.addEventListener("weatherchange", event => syncWeather(event.detail));

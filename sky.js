@@ -631,11 +631,16 @@
     }
   }
 
+  function clearPlanWeather() {
+    try { localStorage.removeItem(PLAN_STORE_KEY); } catch (error) { /* storage blocked: ignore */ }
+  }
+
   window.Sky = {
     names: NAMES,
     set,
     get: () => name,
     getPlanWeather: readPlanWeather,
+    clearPlanWeather,
     mood: n => MOODS[n] || "",
     icon
   };
