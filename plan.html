@@ -9,18 +9,18 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="plan.css">
 </head>
-<body>
+<body class="plan-page">
   <header id="site-header"></header>
 
   <main>
-    <section class="panel plan-intro" aria-labelledby="plan-intro-title">
-      <h1 id="plan-intro-title">Your plan appears here</h1>
-      <p>Enter your name, choose a place, the weather and the temperature, then press "Get my plan". You will get a clear verdict, one best sport, a gear checklist and a report you can save as a PDF. Every plan is also added to your history.</p>
-    </section>
-
     <div class="plan-grid">
+      <section id="plan-intro" class="panel plan-intro" aria-labelledby="plan-intro-title">
+        <h1 id="plan-intro-title">Your plan appears here</h1>
+        <p>Enter your name, choose a place, the weather and the temperature, then press "Get my plan". You will get a clear verdict, one best sport, a gear checklist and a report you can save as a PDF. Every plan is also added to your history.</p>
+      </section>
+
       <form id="plan-form" class="panel" novalidate>
-        <div class="group name-group">
+        <div class="group name-group" id="name-group">
           <label class="field-label" for="name">Your name</label>
           <input class="text-input" type="text" id="name" name="name" maxlength="30" autocomplete="nickname" placeholder="For example: Ann" aria-describedby="name-hint name-error">
           <p class="hint" id="name-hint">Your plan is saved under this name so you can look at your history later.</p>
@@ -44,6 +44,7 @@
           <legend>Weather</legend>
           <button class="btn ghost" id="get-weather" type="button">Get current weather</button>
           <p class="weather-note">Your coordinates are sent to these services to get weather and an approximate city; WeatherFit does not save them. Weather by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>; city lookup by <a href="https://www.bigdatacloud.com/" target="_blank" rel="noopener noreferrer">BigDataCloud</a>.</p>
+          <p id="weather-city" class="weather-city" hidden></p>
           <p id="weather-status" role="status"></p>
           <div class="choices">
             <label class="choice"><input type="radio" name="weather" value="sunny"><span><i class="wx-icon" data-wx-icon="sunny"></i>Sunny</span></label>
@@ -55,32 +56,35 @@
           <p class="error" id="weather-error" role="alert"></p>
         </fieldset>
 
-        <div class="group temp-group">
-          <label class="field-label" for="temp">Temperature</label>
-          <div class="temp-control">
+        <div class="group temp-group" id="temp-group">
+          <div class="temp-row">
+            <label class="field-label" for="temp">Temperature</label>
             <output class="temp-value" id="temp-value" for="temp">22°C</output>
-            <input type="range" id="temp" name="temp" min="-50" max="60" step="1" value="22" aria-describedby="temp-error">
           </div>
+          <input type="range" id="temp" name="temp" min="-50" max="60" step="1" value="22" aria-describedby="temp-error">
           <p class="error" id="temp-error" role="alert"></p>
         </div>
 
         <button class="btn" type="submit">Get my plan</button>
       </form>
 
-      <div class="plan-side">
-        <section id="plan-result" class="panel" aria-live="polite" hidden>
-          <p class="print-only report-head">WeatherFit report · <span id="report-name"></span> · <span id="report-date"></span></p>
+      <section id="plan-result" class="panel result-grid" aria-live="polite" hidden>
+        <p class="print-only report-head">WeatherFit report · <span id="report-name"></span> · <span id="report-date"></span></p>
+
+        <div class="res-head">
           <h2 id="result-title">Your plan</h2>
           <div id="result-summary" class="pills"></div>
+        </div>
 
+        <div class="res-verdict">
           <div id="verdict" class="verdict" data-level="">
             <p class="verdict-label" id="verdict-label"></p>
             <p class="verdict-text" id="verdict-text"></p>
           </div>
           <p id="result-warning" class="warning" hidden></p>
+        </div>
 
-          <p id="save-status" class="save-status no-print"></p>
-
+        <div class="res-best">
           <h3>Your best pick</h3>
           <div id="best-pick" class="best-pick">
             <div class="sport-head">
@@ -94,25 +98,42 @@
             <ul id="best-why" class="why"></ul>
             <p id="best-note" class="tip"></p>
           </div>
+        </div>
 
+        <div class="res-other">
           <h3>Other options</h3>
           <ul id="sports-result" class="sports-list"></ul>
+        </div>
 
+        <div class="res-gear">
           <h3>Gear checklist for your best pick</h3>
           <ul id="gear-result" class="checklist"></ul>
+        </div>
 
-          <div class="actions no-print">
+        <div class="res-actions no-print">
+          <div class="actions">
             <button class="btn" type="button" id="save-pdf">Save as PDF</button>
             <button class="btn ghost" type="button" id="copy-plan">Copy summary</button>
             <button class="btn ghost" type="button" id="start-over">Start over</button>
           </div>
-          <p id="action-status" class="action-status no-print" role="status"></p>
-        </section>
-      </div>
+          <p id="save-status" class="save-status"></p>
+          <p id="action-status" class="action-status" role="status"></p>
+        </div>
+      </section>
     </div>
   </main>
 
   <footer id="site-footer"></footer>
+
+  <dialog id="missing-dialog" class="missing-dialog" aria-labelledby="missing-title">
+    <div class="missing-head">
+      <span class="missing-icon" aria-hidden="true">!</span>
+      <h2 id="missing-title">Your plan is not ready yet</h2>
+    </div>
+    <p class="missing-lead">Please fill in the following before getting your plan:</p>
+    <ul id="missing-list" class="missing-list"></ul>
+    <button class="btn" type="button" id="missing-ok">OK, I'll fill it in</button>
+  </dialog>
 
   <script src="nav.js"></script>
   <script src="sky.js"></script>

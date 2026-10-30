@@ -8,6 +8,11 @@ const tempValueEl = document.getElementById("temp-value");
 const resultEl = document.getElementById("plan-result");
 const getWeatherButton = document.getElementById("get-weather");
 const weatherStatus = document.getElementById("weather-status");
+const weatherCity = document.getElementById("weather-city");
+const introEl = document.getElementById("plan-intro");
+const missingDialog = document.getElementById("missing-dialog");
+const missingList = document.getElementById("missing-list");
+const desktopLayout = window.matchMedia("(min-width: 60rem)");
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -69,6 +74,7 @@ async function fetchJson(url) {
 
 getWeatherButton.addEventListener("click", async () => {
   getWeatherButton.disabled = true;
+  weatherCity.hidden = true;
   weatherStatus.textContent = "Getting your location and current weather…";
 
   try {
@@ -120,8 +126,10 @@ getWeatherButton.addEventListener("click", async () => {
     const city = location && (
       location.city || location.locality || location.principalSubdivision || location.countryName
     );
+    weatherCity.textContent = city || "";
+    weatherCity.hidden = !city;
     weatherStatus.textContent =
-      `${city || "Nearby city unavailable"} · Current weather: ${weather}, ${tempEl.value}°C. Choose an exercise location and get your plan.${limitNote}`;
+      `${city ? "" : "Nearby city unavailable · "}Current weather: ${weather}, ${tempEl.value}°C.${limitNote}`;
   } catch (error) {
     if (error && error.name === "AbortError") {
       weatherStatus.textContent = "The weather request timed out. Please try again or choose the weather manually.";
@@ -139,9 +147,11 @@ getWeatherButton.addEventListener("click", async () => {
 
 // Choosing a weather in the form also changes the sky behind the page
 form.addEventListener("change", event => {
-  if (event.target.name === "weather" && window.Sky) {
-    Sky.set(event.target.value, { save: true, plan: true });
+  if (event.target.name === "weather") {
+    setError("weather", "");
+    if (window.Sky) Sky.set(event.target.value, { save: true, plan: true });
   }
+  if (event.target.name === "place") setError("place", "");
 });
 
 // ---------- 1. Validation ----------
@@ -149,6 +159,8 @@ function setError(id, message) {
   document.getElementById(id + "-error").textContent = message;
   const field = document.getElementById(id);
   if (field) field.setAttribute("aria-invalid", message ? "true" : "false");
+  const group = document.getElementById(id + "-group");
+  if (group) group.classList.toggle("missing", Boolean(message));
 }
 
 function readForm() {
@@ -156,26 +168,62 @@ function readForm() {
   const place   = form.elements.place.value;     // value of the chosen radio button, or ""
   const weather = form.elements.weather.value;
   const temp    = Number(tempEl.value);
-  let ok = true;
+  const missing = [];
 
   setError("name", name ? "" : "Enter your name so your plan can be saved.");
-  if (!name) ok = false;
+  if (!name) missing.push({ id: "name", text: "Your name" });
 
   setError("place", place ? "" : "Choose where you will exercise.");
-  if (!place) ok = false;
+  if (!place) missing.push({ id: "place-group", text: "Where you will exercise" });
 
   setError("weather", weather ? "" : "Choose the weather.");
-  if (!weather) ok = false;
+  if (!weather) missing.push({ id: "weather-group", text: "The weather (choose one, or press “Get current weather”)" });
 
   let tempMessage = "";
   if (!Number.isFinite(temp) || temp < -50 || temp > 60) {
     tempMessage = "Choose a temperature between -50 and 60 °C.";
   }
   setError("temp", tempMessage);
-  if (tempMessage) ok = false;
+  if (tempMessage) missing.push({ id: "temp", text: "A temperature between -50 and 60 °C" });
 
-  return ok ? { name, place, weather, temp } : null;
+  if (missing.length) {
+    showMissing(missing);
+    return null;
+  }
+  return { name, place, weather, temp };
 }
+
+// A clear pop-up that says exactly what is still empty
+function showMissing(missing) {
+  missingList.replaceChildren();
+  missing.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item.text;
+    missingList.appendChild(li);
+  });
+  missingDialog.dataset.focus = missing[0].id;
+  if (typeof missingDialog.showModal === "function") {
+    if (!missingDialog.open) missingDialog.showModal();
+  } else {
+    window.alert("Please fill in:\n- " + missing.map(item => item.text).join("\n- "));
+  }
+}
+
+function closeMissing() {
+  if (missingDialog.open) missingDialog.close();
+}
+document.getElementById("missing-ok").addEventListener("click", closeMissing);
+// clicking the dark area outside the box also closes it
+missingDialog.addEventListener("click", event => {
+  if (event.target === missingDialog) closeMissing();
+});
+// afterwards, move to the first empty field
+missingDialog.addEventListener("close", () => {
+  const target = document.getElementById(missingDialog.dataset.focus || "");
+  if (!target) return;
+  const focusable = target.matches("input, button") ? target : target.querySelector("input, button");
+  if (focusable) focusable.focus();
+});
 
 // ---------- 2. Recommendation rules ----------
 // Every outdoor sport that suits the place, weather and temperature gets a fit score (0-100).
@@ -341,6 +389,7 @@ function showPlan(values) {
   document.getElementById("result-summary").replaceChildren(
     makePill(PLACES[plan.place]), makePill(weatherName), makePill(`${plan.temp}°C`)
   );
+  document.getElementById("result-title").textContent = `Plan for ${plan.name}`;
   document.getElementById("report-name").textContent = plan.name;
   document.getElementById("report-date").textContent = new Date().toLocaleDateString("en-GB", {
     day: "numeric", month: "long", year: "numeric"
@@ -402,12 +451,13 @@ function showPlan(values) {
   saveToHistory(plan);
 
   document.getElementById("action-status").textContent = "";
+  introEl.hidden = true;           // the "Your plan appears here" note is no longer needed
   resultEl.hidden = false;
   resultEl.style.animation = "none";
   void resultEl.offsetWidth;
   resultEl.style.animation = "";
 
-  if (window.innerWidth < 960) {
+  if (!desktopLayout.matches) {
     resultEl.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
   }
 }
@@ -458,7 +508,12 @@ document.getElementById("start-over").addEventListener("click", () => {
   ["name", "place", "weather", "temp"].forEach(id => setError(id, ""));
   currentPlan = null;
   resultEl.hidden = true;
-  form.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+  introEl.hidden = false;
+  weatherCity.hidden = true;
+  weatherStatus.textContent = "";
+  if (!desktopLayout.matches) {
+    form.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+  }
 });
 
 form.addEventListener("submit", event => {
