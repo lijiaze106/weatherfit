@@ -1,8 +1,25 @@
 /* About page only */
 
+/* ---------- Overview ---------- */
+.about-overview {
+  display: grid;
+  gap: 1.1rem;
+  align-items: stretch;
+}
+.about-overview .panel { height: 100%; }
+.about-overview h1, .about-overview h2 {
+  margin-bottom: .75rem;
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+}
+.about-overview p { max-width: 42rem; margin-bottom: 0; }
+
 /* ---------- User stories ---------- */
-.stories { margin-top: 2.5rem; }
-.stories-intro { max-width: 40rem; margin: .75rem 0 1.5rem; }
+.stories { margin-top: 3rem; }
+.stories-heading {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
 
 .story-tag {
   display: inline-block;
@@ -38,8 +55,9 @@
 
 .story-grid { display: grid; gap: 1.1rem; }
 
-/* ---------- The rest of the page ---------- */
-.about-grid { display: grid; gap: 1.1rem; margin-top: 2.5rem; }
+/* ---------- More about WeatherFit ---------- */
+.about-details { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--panel-line); }
+.about-grid { display: grid; gap: 1.1rem; }
 .about-grid h2 { margin-bottom: .6rem; font-size: 1.6rem; }
 .about-grid p:last-child { margin-bottom: 0; }
 
@@ -54,6 +72,7 @@
 }
 
 @media (min-width: 48rem) {
+  .about-overview { grid-template-columns: 1.35fr 1fr; gap: 1.4rem; }
   .story-grid { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
   .about-grid { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
   .about-grid .wide { grid-column: 1 / -1; }

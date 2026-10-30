@@ -3,11 +3,8 @@
 // Uses Sky from sky.js.
 
 const buttons = document.querySelectorAll(".wx");
-let cycleTimer;
-let isCycling = false;
 
-function showWeather(name, save = true) {
-  Sky.set(name, { save });
+function syncWeather(name) {
   buttons.forEach(button => {
     const on = button.dataset.weather === name;
     button.classList.toggle("is-active", on);
@@ -15,43 +12,19 @@ function showWeather(name, save = true) {
   });
 }
 
-function stopCycling() {
-  isCycling = false;
-  window.clearInterval(cycleTimer);
-  cycleTimer = null;
+function showWeather(name) {
+  Sky.set(name, { save: true });
+  syncWeather(Sky.get());
 }
 
 buttons.forEach(button => {
   const name = button.dataset.weather;
   button.addEventListener("pointerenter", event => {
-    if (event.pointerType === "mouse") {
-      stopCycling();
-      Sky.clearPlanWeather();
-      showWeather(name);
-    }
+    if (event.pointerType === "mouse") showWeather(name);
   });
-  button.addEventListener("focus", () => {
-    stopCycling();
-    Sky.clearPlanWeather();
-    showWeather(name);
-  });
-  button.addEventListener("click", () => {
-    stopCycling();
-    Sky.clearPlanWeather();
-    showWeather(name);
-  });
+  button.addEventListener("focus", () => showWeather(name));
+  button.addEventListener("click", () => showWeather(name));
 });
 
-const planWeather = Sky.getPlanWeather();
-const initialWeather = planWeather || Sky.get();
-showWeather(initialWeather, !planWeather);
-
-if (!planWeather) {
-  let weatherIndex = Sky.names.indexOf(initialWeather);
-  isCycling = true;
-  cycleTimer = window.setInterval(() => {
-    if (!isCycling) return;
-    weatherIndex = (weatherIndex + 1) % Sky.names.length;
-    showWeather(Sky.names[weatherIndex], false);
-  }, 3000);
-}
+document.addEventListener("weatherchange", event => syncWeather(event.detail));
+syncWeather(Sky.get());

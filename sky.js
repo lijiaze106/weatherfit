@@ -75,7 +75,8 @@
     } catch (error) { return null; }
   }
 
-  let name = document.documentElement.dataset.weather;
+  const savedPlanWeather = readPlanWeather();
+  let name = savedPlanWeather || document.documentElement.dataset.weather;
   if (!NAMES.includes(name)) name = readSaved() || "sunny";
   document.documentElement.dataset.weather = name;
 
@@ -613,6 +614,8 @@
   // ---------- Public functions ----------
   function set(next, options) {
     if (!NAMES.includes(next)) return;
+    const planWeather = readPlanWeather();
+    if (planWeather && !(options && options.plan)) return;
     if (next !== name) {
       name = next;
       target = TARGETS[next];
@@ -628,19 +631,26 @@
     }
   }
 
-  function clearPlanWeather() {
-    try { localStorage.removeItem(PLAN_STORE_KEY); } catch (error) { /* storage blocked: ignore */ }
-  }
-
   window.Sky = {
     names: NAMES,
     set,
     get: () => name,
     getPlanWeather: readPlanWeather,
-    clearPlanWeather,
     mood: n => MOODS[n] || "",
     icon
   };
+
+  window.addEventListener("storage", event => {
+    if (event.key !== PLAN_STORE_KEY) return;
+    const planWeather = readPlanWeather();
+    if (planWeather) set(planWeather, { save: true, plan: true });
+  });
+
+  window.setInterval(() => {
+    if (readPlanWeather()) return;
+    const currentIndex = NAMES.indexOf(name);
+    set(NAMES[(currentIndex + 1) % NAMES.length], { save: true });
+  }, 3000);
 
   // ---------- Start ----------
   if (ctx) {
