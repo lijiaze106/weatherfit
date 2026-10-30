@@ -5,7 +5,6 @@ const form     = document.getElementById("plan-form");
 const nameEl   = document.getElementById("name");
 const tempEl   = document.getElementById("temp");
 const tempValueEl = document.getElementById("temp-value");
-const emptyEl  = document.getElementById("plan-empty");
 const resultEl = document.getElementById("plan-result");
 const getWeatherButton = document.getElementById("get-weather");
 const weatherStatus = document.getElementById("weather-status");
@@ -403,7 +402,6 @@ function showPlan(values) {
   saveToHistory(plan);
 
   document.getElementById("action-status").textContent = "";
-  emptyEl.hidden = true;
   resultEl.hidden = false;
   resultEl.style.animation = "none";
   void resultEl.offsetWidth;
@@ -460,7 +458,6 @@ document.getElementById("start-over").addEventListener("click", () => {
   ["name", "place", "weather", "temp"].forEach(id => setError(id, ""));
   currentPlan = null;
   resultEl.hidden = true;
-  emptyEl.hidden = false;
   form.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
 });
 

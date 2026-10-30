@@ -13,12 +13,14 @@
   <header id="site-header"></header>
 
   <main>
-    <h1>Your Plan</h1>
-    <p class="lead">Tell WeatherFit where you will exercise and what it is like outside. Load current weather from your location or choose it yourself; the sky follows your weather choice.</p>
+    <section class="panel plan-intro" aria-labelledby="plan-intro-title">
+      <h1 id="plan-intro-title">Your plan appears here</h1>
+      <p>Enter your name, choose a place, the weather and the temperature, then press "Get my plan". You will get a clear verdict, one best sport, a gear checklist and a report you can save as a PDF. Every plan is also added to your history.</p>
+    </section>
 
     <div class="plan-grid">
       <form id="plan-form" class="panel" novalidate>
-        <div class="group">
+        <div class="group name-group">
           <label class="field-label" for="name">Your name</label>
           <input class="text-input" type="text" id="name" name="name" maxlength="30" autocomplete="nickname" placeholder="For example: Ann" aria-describedby="name-hint name-error">
           <p class="hint" id="name-hint">Your plan is saved under this name so you can look at your history later.</p>
@@ -53,7 +55,7 @@
           <p class="error" id="weather-error" role="alert"></p>
         </fieldset>
 
-        <div class="group">
+        <div class="group temp-group">
           <label class="field-label" for="temp">Temperature</label>
           <div class="temp-control">
             <output class="temp-value" id="temp-value" for="temp">22°C</output>
@@ -66,11 +68,6 @@
       </form>
 
       <div class="plan-side">
-        <div id="plan-empty" class="panel empty">
-          <h2>Your plan appears here</h2>
-          <p>Enter your name, choose a place, the weather and the temperature, then press "Get my plan". You will get a clear verdict, one best sport, a gear checklist and a report you can save as a PDF. Every plan is also added to your history.</p>
-        </div>
-
         <section id="plan-result" class="panel" aria-live="polite" hidden>
           <p class="print-only report-head">WeatherFit report · <span id="report-name"></span> · <span id="report-date"></span></p>
           <h2 id="result-title">Your plan</h2>

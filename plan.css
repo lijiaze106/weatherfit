@@ -1,6 +1,14 @@
 /* Your Plan page only */
 
-.plan-grid { display: grid; gap: 1.25rem; margin-top: 2rem; align-items: start; }
+.plan-intro {
+  display: grid;
+  gap: .75rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.plan-intro h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.4rem); }
+.plan-intro p { margin: 0; max-width: 62rem; }
+
+.plan-grid { display: grid; gap: 1.25rem; margin-top: 0; align-items: start; }
 
 #plan-form .group { margin: 0 0 1.5rem; }
 #plan-form .btn { width: 100%; }
@@ -67,10 +75,7 @@
 }
 
 .plan-side { position: relative; }
-.empty h2 { margin-bottom: .75rem; }
-.empty p { margin: 0; }
-
-#plan-empty[hidden], #plan-result[hidden], #result-warning[hidden] { display: none; }
+#plan-result[hidden], #result-warning[hidden] { display: none; }
 
 /* ---------- Result ---------- */
 #plan-result { animation: pop .5s cubic-bezier(.2, .9, .3, 1.2); }
@@ -155,7 +160,7 @@
 
 /* ---------- Printing / Save as PDF: only the report ---------- */
 @media print {
-  #sky, #site-header, #site-footer, #plan-form, #plan-empty, .no-print, .lead, main > h1 { display: none !important; }
+  #sky, #site-header, #site-footer, #plan-form, .no-print, .lead, main > h1 { display: none !important; }
   html, body { background: #fff !important; color: #000 !important; }
   main { padding: 0; width: 100%; max-width: none; }
   .plan-grid { display: block; margin: 0; }
@@ -176,6 +181,31 @@
 }
 
 @media (min-width: 60rem) {
-  .plan-grid { grid-template-columns: minmax(0, 27rem) minmax(0, 1fr); gap: 1.75rem; }
+  .plan-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 1.75rem; }
   .plan-side { position: sticky; top: 6rem; }
+}
+
+@media (min-width: 48rem) {
+  .plan-intro {
+    grid-template-columns: minmax(15rem, .75fr) minmax(0, 1.5fr);
+    align-items: center;
+  }
+  #plan-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 1rem;
+  }
+  #plan-form .group { margin-bottom: 1rem; }
+  #plan-form .name-group { grid-column: 1; }
+  #place-group { grid-column: 2; }
+  #place-group .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #weather-group { grid-column: 1 / -1; }
+  #weather-group .choices { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  #plan-form .choice span { min-height: 2.6rem; padding: .4rem .5rem; }
+  #plan-form .temp-group { grid-column: 1; }
+  #plan-form > button[type="submit"] {
+    grid-column: 2;
+    align-self: end;
+    margin-bottom: 1rem;
+  }
 }
