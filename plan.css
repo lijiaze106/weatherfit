@@ -18,6 +18,8 @@
 
 #plan-form .group { margin: 0 0 1.5rem; }
 #plan-form .btn { width: 100%; }
+#plan-form .form-actions { display: flex; gap: .6rem; }
+#plan-form .form-actions .btn { flex: 1 1 0; width: auto; }
 #get-weather { margin: 0 0 .5rem; }
 .weather-note, #weather-status { margin: 0 0 .5rem; font-size: .9rem; }
 #weather-status { min-height: 1.3em; }
@@ -289,7 +291,7 @@ html[data-weather="rainy"] .missing-dialog { background: #14263b; color: #eef5fc
   #place-group .choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #weather-group { grid-column: 1 / -1; }
   #weather-group .choices { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  #plan-form > button[type="submit"] { grid-column: 1 / -1; }
+  #plan-form > .form-actions, #plan-form > #draft-status { grid-column: 1 / -1; }
 }
 
 /* ---------- Desktop: everything on one screen, the result uses the right side ---------- */
@@ -437,7 +439,7 @@ html[data-weather="rainy"] .missing-dialog { background: #14263b; color: #eef5fc
   .weather-city { font-size: 2.6rem; }
   #weather-status { font-size: 1rem; }
   .temp-value { font-size: 1.5rem; }
-  #plan-form > .btn { padding: 1.05rem 1.4rem; font-size: 1.1rem; }
+  #plan-form > .form-actions .btn { padding: 1.05rem 1.4rem; font-size: 1.1rem; }
 
   .plan-intro h1 { font-size: clamp(2.6rem, 4.5vw, 4.2rem); }
   .plan-intro p { font-size: 1.3rem; }

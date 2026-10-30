@@ -12,17 +12,25 @@ const weatherCity = document.getElementById("weather-city");
 const introEl = document.getElementById("plan-intro");
 const missingDialog = document.getElementById("missing-dialog");
 const missingList = document.getElementById("missing-list");
+const draftStatus = document.getElementById("draft-status");
 const desktopLayout = window.matchMedia("(min-width: 60rem)");
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let currentPlan = null;
+let resultValues = null;
+let restoredGear = new Set();
 
 // Remember the last name used on this device
 nameEl.value = PlanStore.lastName();
-nameEl.addEventListener("input", () => setError("name", ""));
+nameEl.addEventListener("input", () => {
+  setError("name", "");
+  saveDraft();
+});
 
 tempEl.addEventListener("input", () => {
   tempValueEl.textContent = `${tempEl.value}°C`;
   setError("temp", "");
+  saveDraft();
 });
 
 function weatherFromCode(code, windSpeed) {
@@ -130,6 +138,7 @@ getWeatherButton.addEventListener("click", async () => {
     weatherCity.hidden = !city;
     weatherStatus.textContent =
       `${city ? "" : "Nearby city unavailable · "}Current weather: ${weather}, ${tempEl.value}°C.${limitNote}`;
+    saveDraft();
   } catch (error) {
     if (error && error.name === "AbortError") {
       weatherStatus.textContent = "The weather request timed out. Please try again or choose the weather manually.";
@@ -152,7 +161,29 @@ form.addEventListener("change", event => {
     if (window.Sky) Sky.set(event.target.value, { save: true, plan: true });
   }
   if (event.target.name === "place") setError("place", "");
+  saveDraft();
 });
+
+function saveDraft() {
+  const place = form.querySelector('input[name="place"]:checked');
+  const weather = form.querySelector('input[name="weather"]:checked');
+  const checkedGear = currentPlan
+    ? [...document.querySelectorAll("#gear-result input:checked")].map(input => input.value)
+    : [];
+  const saved = PlanStore.saveDraft({
+    form: {
+      name: nameEl.value,
+      place: place ? place.value : "",
+      weather: weather ? weather.value : "",
+      temp: tempEl.value
+    },
+    result: resultValues,
+    checkedGear
+  });
+  draftStatus.textContent = saved
+    ? ""
+    : "This browser could not save your in-progress plan. Check its storage settings.";
+}
 
 // ---------- 1. Validation ----------
 function setError(id, message) {
@@ -337,8 +368,6 @@ function buildPlan(place, weather, temp) {
 }
 
 // ---------- 3. Showing the result ----------
-let currentPlan = null;
-
 // Every plan is added to the history of the person who typed the name
 function saveToHistory(plan) {
   const saved = PlanStore.add({
@@ -380,7 +409,7 @@ function makePill(text) {
   return span;
 }
 
-function showPlan(values) {
+function showPlan(values, options = {}) {
   const plan = buildPlan(values.place, values.weather, values.temp);
   plan.name = values.name;
   currentPlan = plan;
@@ -441,6 +470,9 @@ function showPlan(values) {
     const box = document.createElement("input");
     box.type = "checkbox";
     box.id = id;
+    box.value = item;
+    box.checked = restoredGear.has(item);
+    box.addEventListener("change", saveDraft);
     const label = document.createElement("label");
     label.htmlFor = id;
     label.textContent = item;
@@ -448,7 +480,7 @@ function showPlan(values) {
     return li;
   });
 
-  saveToHistory(plan);
+  if (options.saveHistory !== false) saveToHistory(plan);
 
   document.getElementById("action-status").textContent = "";
   introEl.hidden = true;           // the "Your plan appears here" note is no longer needed
@@ -457,7 +489,7 @@ function showPlan(values) {
   void resultEl.offsetWidth;
   resultEl.style.animation = "";
 
-  if (!desktopLayout.matches) {
+  if (options.scroll !== false && !desktopLayout.matches) {
     resultEl.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
   }
 }
@@ -501,23 +533,88 @@ document.getElementById("copy-plan").addEventListener("click", async () => {
   }
 });
 
-document.getElementById("start-over").addEventListener("click", () => {
+function resetPlan() {
+  const cleared = PlanStore.clearDraft();
   form.reset();
   nameEl.value = PlanStore.lastName();
   tempValueEl.textContent = `${tempEl.value}°C`;
   ["name", "place", "weather", "temp"].forEach(id => setError(id, ""));
   currentPlan = null;
+  resultValues = null;
+  restoredGear.clear();
   resultEl.hidden = true;
   introEl.hidden = false;
   weatherCity.hidden = true;
   weatherStatus.textContent = "";
+  document.getElementById("save-status").replaceChildren();
+  document.getElementById("action-status").textContent = "";
+  draftStatus.textContent = cleared
+    ? ""
+    : "The in-progress plan could not be removed because the browser blocks storage.";
   if (!desktopLayout.matches) {
     form.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
   }
-});
+}
+
+document.getElementById("reset-plan").addEventListener("click", resetPlan);
+document.getElementById("start-over").addEventListener("click", resetPlan);
 
 form.addEventListener("submit", event => {
   event.preventDefault();
   const values = readForm();
-  if (values) showPlan(values);
+  if (values) {
+    resultValues = { ...values };
+    restoredGear.clear();
+    showPlan(values);
+    saveDraft();
+  }
 });
+
+function isValidPlanValues(values) {
+  const placeExists = values && typeof values.place === "string" &&
+    [...form.querySelectorAll('input[name="place"]')].some(option => option.value === values.place);
+  return values && typeof values.name === "string" && values.name.trim() &&
+    placeExists &&
+    typeof values.weather === "string" && Sky.names.includes(values.weather) &&
+    (typeof values.temp === "string" || typeof values.temp === "number") &&
+    String(values.temp).trim() !== "" &&
+    Number.isFinite(Number(values.temp)) &&
+    Number(values.temp) >= Number(tempEl.min) && Number(values.temp) <= Number(tempEl.max);
+}
+
+function restoreDraft() {
+  const draft = PlanStore.getDraft();
+  if (!draft || !draft.form || typeof draft.form !== "object") return;
+
+  const values = draft.form;
+  if (typeof values.name === "string") nameEl.value = values.name.slice(0, 30);
+  if (typeof values.place === "string") {
+    const place = [...form.querySelectorAll('input[name="place"]')].find(option => option.value === values.place);
+    if (place) place.checked = true;
+  }
+  if (typeof values.weather === "string" && Sky.names.includes(values.weather)) {
+    const weather = form.querySelector(`input[name="weather"][value="${values.weather}"]`);
+    if (weather) {
+      weather.checked = true;
+      Sky.set(values.weather, { save: true, plan: true });
+    }
+  }
+  const temp = Number(values.temp);
+  if (Number.isFinite(temp) && temp >= Number(tempEl.min) && temp <= Number(tempEl.max)) {
+    tempEl.value = String(temp);
+  }
+  tempValueEl.textContent = `${tempEl.value}°C`;
+
+  if (isValidPlanValues(draft.result)) {
+    resultValues = {
+      name: draft.result.name.slice(0, 30),
+      place: draft.result.place,
+      weather: draft.result.weather,
+      temp: Number(draft.result.temp)
+    };
+    if (Array.isArray(draft.checkedGear)) restoredGear = new Set(draft.checkedGear.filter(item => typeof item === "string"));
+    showPlan(resultValues, { saveHistory: false, scroll: false });
+  }
+}
+
+restoreDraft();

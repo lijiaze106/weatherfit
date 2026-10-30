@@ -65,7 +65,11 @@
           <p class="error" id="temp-error" role="alert"></p>
         </div>
 
-        <button class="btn" type="submit">Get my plan</button>
+        <div class="form-actions">
+          <button class="btn" type="submit">Get my plan</button>
+          <button class="btn ghost" type="button" id="reset-plan">Reset</button>
+        </div>
+        <p id="draft-status" class="save-status" role="status"></p>
       </form>
 
       <section id="plan-result" class="panel result-grid" aria-live="polite" hidden>

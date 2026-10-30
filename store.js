@@ -5,6 +5,7 @@
 const PlanStore = (() => {
   const HISTORY_KEY = "weatherfit-history";
   const NAME_KEY = "weatherfit-name";
+  const DRAFT_KEY = "weatherfit-plan-draft";
   const MAX_RECORDS = 500;
 
   // Names are grouped without caring about upper/lower case: "Ann" and "ann" are the same person
@@ -55,6 +56,33 @@ const PlanStore = (() => {
     return saveAll([]);
   }
 
+  function getDraft() {
+    try {
+      const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+      return draft && typeof draft === "object" && !Array.isArray(draft) ? draft : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function saveDraft(draft) {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function clearDraft() {
+    try {
+      localStorage.removeItem(DRAFT_KEY);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   // [{ key, label, count }] for every person who has records (label = most recent spelling)
   function people() {
     const map = new Map();
@@ -76,5 +104,8 @@ const PlanStore = (() => {
     try { localStorage.setItem(NAME_KEY, name); } catch (error) { /* ignore */ }
   }
 
-  return { keyOf, all, add, remove, removeByName, clear, people, lastName, setLastName };
+  return {
+    keyOf, all, add, remove, removeByName, clear, people, lastName, setLastName,
+    getDraft, saveDraft, clearDraft
+  };
 })();
