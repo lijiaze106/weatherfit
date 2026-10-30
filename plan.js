@@ -516,10 +516,123 @@ function summaryText(plan) {
   return lines.join("\n");
 }
 
-document.getElementById("save-pdf").addEventListener("click", () => {
+// ---- Save as PDF: build a plain report page and download it as a real .pdf file ----
+// (html2pdf.js is loaded from a CDN the first time it is needed. If it cannot be loaded,
+//  for example when offline, the browser's print window opens instead.)
+const PDF_LIB_URL = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+let pdfLibPromise = null;
+
+function loadPdfLib() {
+  if (window.html2pdf) return Promise.resolve();
+  if (!pdfLibPromise) {
+    pdfLibPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = PDF_LIB_URL;
+      script.onload = resolve;
+      script.onerror = () => { pdfLibPromise = null; reject(new Error("PDF library not available")); };
+      document.head.appendChild(script);
+    });
+  }
+  return pdfLibPromise;
+}
+
+// A simple white page with inline styles, so the PDF looks the same on every theme
+function buildReportElement(plan) {
+  const weatherName = plan.weather.charAt(0).toUpperCase() + plan.weather.slice(1);
+  const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const levelColor = { go: "#1e7a3c", ok: "#b26a00", stay: "#b3261e" }[plan.level] || "#ff7a1a";
+
+  const root = document.createElement("div");
+  root.style.cssText = "position:fixed;top:0;left:-10000px;width:720px;padding:8px 4px;background:#fff;color:#14212d;" +
+    "font-family:'DM Sans','Segoe UI','PingFang SC','Microsoft YaHei',Arial,sans-serif;font-size:14px;line-height:1.5;";
+
+  const add = (parent, tag, css, text) => {
+    const el = document.createElement(tag);
+    if (css) el.style.cssText = css;
+    if (text !== undefined) el.textContent = text;
+    parent.appendChild(el);
+    return el;
+  };
+
+  // Header
+  const head = add(root, "div", "border-bottom:3px solid #ff7a1a;padding-bottom:10px;margin-bottom:16px;");
+  add(head, "div", "font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#ff7a1a;", "WeatherFit report");
+  add(head, "div", "font-size:28px;font-weight:800;margin-top:2px;", `Plan for ${plan.name}`);
+  add(head, "div", "color:#5b6b7b;margin-top:2px;", `${date}  ·  ${PLACES[plan.place]}  ·  ${weatherName}  ·  ${plan.temp}°C`);
+
+  // Verdict
+  const verdict = add(root, "div", `border-left:6px solid ${levelColor};background:#f4f6f8;border-radius:8px;padding:12px 16px;margin-bottom:14px;`);
+  add(verdict, "div", "font-size:20px;font-weight:800;", plan.label);
+  add(verdict, "div", "margin-top:2px;", plan.text);
+  if (plan.warning) {
+    add(root, "div", "background:#b3261e;color:#fff;font-weight:700;border-radius:8px;padding:10px 14px;margin-bottom:14px;", plan.warning);
+  }
+
+  // Best pick
+  add(root, "div", "font-size:16px;font-weight:800;margin:6px 0;", "Your best pick");
+  const best = add(root, "div", "background:#f4f6f8;border-radius:8px;padding:12px 16px;margin-bottom:14px;");
+  add(best, "div", "font-size:20px;font-weight:800;", `${plan.best.sport.name}  (${plan.best.sport.place})`);
+  const hasScore = plan.best.score !== null;
+  add(best, "div", "font-weight:700;margin:4px 0;", hasScore ? `Fit score: ${plan.best.score} / 100` : "Fit score: not needed indoors");
+  const track = add(best, "div", "height:8px;background:#dde3e9;border-radius:99px;margin-bottom:8px;");
+  add(track, "div", `height:8px;width:${hasScore ? plan.best.score : 100}%;background:#ff7a1a;border-radius:99px;`);
+  const why = add(best, "ul", "margin:0 0 6px;padding-left:20px;");
+  plan.why.forEach(item => add(why, "li", "", item));
+  add(best, "div", "font-style:italic;", "Tip: " + plan.best.sport.note);
+
+  // Other options
+  add(root, "div", "font-size:16px;font-weight:800;margin:6px 0;", "Other options");
+  plan.alternatives.forEach(alt => {
+    const box = add(root, "div", "background:#f4f6f8;border-radius:8px;padding:8px 14px;margin-bottom:8px;");
+    add(box, "div", "font-weight:800;", `${alt.sport.name}  (${alt.sport.place})`);
+    add(box, "div", "color:#3c4b5a;", alt.reason);
+  });
+
+  // Gear checklist
+  add(root, "div", "font-size:16px;font-weight:800;margin:14px 0 6px;", "Gear checklist");
+  const gear = add(root, "div", "display:flex;flex-wrap:wrap;");
+  plan.gear.forEach(item => {
+    const row = add(gear, "div", "width:50%;display:flex;align-items:center;margin-bottom:6px;");
+    add(row, "span", "display:inline-block;width:14px;height:14px;border:2px solid #14212d;border-radius:3px;margin-right:8px;flex:none;");
+    add(row, "span", "", item);
+  });
+
+  add(root, "div", "margin-top:18px;padding-top:8px;border-top:1px solid #dde3e9;font-size:11px;color:#6b7a89;",
+    "WeatherFit gives general suggestions only. Use your own judgement about local conditions and what your body can handle.");
+  return root;
+}
+
+document.getElementById("save-pdf").addEventListener("click", async () => {
+  if (!currentPlan) return;
+  const button = document.getElementById("save-pdf");
   const status = document.getElementById("action-status");
-  status.textContent = "In the print window, choose “Save as PDF” as the destination.";
-  window.print();
+  const plan = currentPlan;
+  let report = null;
+
+  button.disabled = true;
+  status.textContent = "Creating your PDF…";
+  try {
+    await loadPdfLib();
+    report = buildReportElement(plan);
+    document.body.appendChild(report);
+    const safeName = plan.name.replace(/[\\/:*?"<>|\s]+/g, "-");
+    const day = new Date().toISOString().slice(0, 10);
+    await window.html2pdf().set({
+      margin: [10, 10, 10, 10],
+      filename: `WeatherFit-${safeName}-${day}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff", scrollX: 0, scrollY: 0 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: ["avoid-all", "css"] }
+    }).from(report).save();
+    status.textContent = "PDF downloaded. Check your Downloads folder.";
+  } catch (error) {
+    status.textContent = "The PDF file could not be created here, so the print window opened. Choose “Save as PDF” there.";
+    window.print();
+  } finally {
+    if (report) report.remove();
+    button.disabled = false;
+  }
 });
 
 document.getElementById("copy-plan").addEventListener("click", async () => {
