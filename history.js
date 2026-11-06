@@ -8,7 +8,7 @@ const emptyBox   = document.getElementById("history-empty");
 const statusEl   = document.getElementById("history-status");
 const deleteBtn  = document.getElementById("delete-shown");
 
-let shown = [];   // the records currently on the screen
+let shown = [];   
 
 function cap(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
