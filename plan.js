@@ -1053,8 +1053,9 @@ document.getElementById("copy-plan").addEventListener("click", async () => {
 
 function resetPlan() {
   const cleared = PlanStore.clearDraft();
+  const nameCleared = PlanStore.clearLastName();
   form.reset();
-  nameEl.value = PlanStore.lastName();
+  nameEl.value = "";
   tempValueEl.textContent = `${tempEl.value}°C`;
   ["name", "place", "weather", "temp"].forEach(id => setError(id, ""));
   currentPlan = null;
@@ -1066,9 +1067,10 @@ function resetPlan() {
   weatherStatus.textContent = "";
   document.getElementById("save-status").replaceChildren();
   document.getElementById("action-status").textContent = "";
-  draftStatus.textContent = cleared
-    ? ""
-    : "The in-progress plan could not be removed because the browser blocks storage.";
+  draftStatus.textContent = [
+    cleared ? "" : "The in-progress plan could not be removed because the browser blocks storage.",
+    nameCleared ? "" : "Your name could not be cleared from this browser's storage."
+  ].filter(Boolean).join(" ");
   if (!desktopLayout.matches) {
     form.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
   }

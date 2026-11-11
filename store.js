@@ -104,8 +104,17 @@ const PlanStore = (() => {
     try { localStorage.setItem(NAME_KEY, name); } catch (error) { /* ignore */ }
   }
 
+  function clearLastName() {
+    try {
+      localStorage.removeItem(NAME_KEY);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   return {
-    keyOf, all, add, remove, removeByName, clear, people, lastName, setLastName,
+    keyOf, all, add, remove, removeByName, clear, people, lastName, setLastName, clearLastName,
     getDraft, saveDraft, clearDraft
   };
 })();
